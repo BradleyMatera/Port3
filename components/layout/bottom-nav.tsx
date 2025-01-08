@@ -41,13 +41,13 @@ export function BottomNav() {
         </Link>
         
         <Link 
-          href="/inbox" 
+          href="/player" 
           className={`flex flex-col items-center space-y-1 ${
             pathname === '/inbox' ? 'text-[#FF385C]' : 'text-zinc-400'
           }`}
         >
           <MessageSquare size={24} />
-          <span className="text-xs">Inbox</span>
+          <span className="text-xs">Player</span>
         </Link>
         
         <Link 

@@ -13,7 +13,14 @@ export default function SpotifyPlayerPage() {
   });
 
   const requiredScopes = ['streaming', 'user-read-email', 'user-read-private'];
-  const accessToken = localStorage.getItem('spotify_access_token');
+  const [accessToken, setAccessToken] = useState(null);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('spotify_access_token');
+      setAccessToken(token);
+    }
+  }, []);
 
   useEffect(() => {
     if (!accessToken) {
@@ -22,7 +29,7 @@ export default function SpotifyPlayerPage() {
     }
 
     const validateScopes = () => {
-      // Use a mock approach to validate scopes since token parsing can vary
+      // Simulate scope validation. Replace this logic with real JWT decoding as necessary.
       const mockScopesFromToken = ['streaming', 'user-read-email', 'user-read-private']; // Example only
       const missingScopes = requiredScopes.filter((scope) => !mockScopesFromToken.includes(scope));
 
@@ -34,6 +41,7 @@ export default function SpotifyPlayerPage() {
     };
 
     if (!validateScopes()) {
+      console.error('Access token does not have required scopes.');
       return;
     }
 

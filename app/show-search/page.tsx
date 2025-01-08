@@ -7,15 +7,48 @@ export default function SpotifyShowSearch() {
   const [shows, setShows] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
-  const accessToken = localStorage.getItem('spotify_access_token');
+  const [accessToken, setAccessToken] = useState(null);
 
   useEffect(() => {
-    if (!accessToken) {
-      console.error('Access token missing or expired.');
+    if (typeof window !== 'undefined') {
+      // Retrieve the access token from localStorage
+      const storedToken = localStorage.getItem('spotify_access_token');
+      if (!storedToken) {
+        console.error('Access token is missing or expired.');
+        redirectToLogin();
+        return;
+      }
+
+      // Validate token scopes
+      const requiredScopes = ['user-read-email', 'user-read-private', 'streaming'];
+      if (!validateScopes(storedToken, requiredScopes)) {
+        console.error('Access token is missing required scopes.');
+        redirectToLogin();
+        return;
+      }
+
+      // Set access token
+      setAccessToken(storedToken);
+    }
+  }, []);
+
+  const validateScopes = (token, requiredScopes) => {
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1])); // Decode JWT
+      const tokenScopes = payload.scope?.split(' ') || [];
+      return requiredScopes.every((scope) => tokenScopes.includes(scope));
+    } catch (error) {
+      console.error('Failed to validate token scopes:', error);
+      return false;
+    }
+  };
+
+  const redirectToLogin = () => {
+    // Ensure redirect happens only once to avoid infinite loops
+    if (typeof window !== 'undefined') {
       window.location.href = '/login';
     }
-  }, [accessToken]);
+  };
 
   const handleSearch = async (e) => {
     e.preventDefault();
@@ -34,7 +67,7 @@ export default function SpotifyShowSearch() {
 
       if (response.ok) {
         const data = await response.json();
-        setShows(data.shows.items || []);
+        setShows(data.shows?.items || []);
       } else if (response.status === 403) {
         console.error('Permission denied. Ensure proper scopes.');
         setError('Permission denied. Check your Spotify scopes.');

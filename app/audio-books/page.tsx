@@ -1,17 +1,28 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function AudiobooksSearchPage() {
   const [query, setQuery] = useState('');
   const [audiobooks, setAudiobooks] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [accessToken, setAccessToken] = useState(null);
 
-  const accessToken = localStorage.getItem('spotify_access_token');
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('spotify_access_token');
+      if (!token) {
+        console.error('Access token is missing or expired.');
+        window.location.href = '/login';
+      } else {
+        setAccessToken(token);
+      }
+    }
+  }, []);
 
   const handleSearch = async () => {
-    if (!query) {
+    if (!query.trim()) {
       setError('Please enter a search term.');
       return;
     }
@@ -93,7 +104,8 @@ export default function AudiobooksSearchPage() {
                   By {audiobook.authors.map((author) => author.name).join(', ')}
                 </p>
                 <p className="text-sm text-gray-400">
-                  Narrated by {audiobook.narrators.map((narrator) => narrator.name).join(', ')}
+                  Narrated by{' '}
+                  {audiobook.narrators.map((narrator) => narrator.name).join(', ')}
                 </p>
               </div>
             </div>

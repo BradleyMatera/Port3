@@ -21,23 +21,23 @@ export function BottomNav() {
         </Link>
         
         <Link 
-          href="/wishlists" 
+          href="/show-search" 
           className={`flex flex-col items-center space-y-1 ${
             pathname === '/wishlists' ? 'text-[#FF385C]' : 'text-zinc-400'
           }`}
         >
           <Heart size={24} />
-          <span className="text-xs">Wishlists</span>
+          <span className="text-xs">Show Search</span>
         </Link>
         
         <Link 
-          href="/trips" 
+          href="/audio-books" 
           className={`flex flex-col items-center space-y-1 ${
             pathname === '/trips' ? 'text-[#FF385C]' : 'text-zinc-400'
           }`}
         >
           <Home size={24} />
-          <span className="text-xs">Trips</span>
+          <span className="text-xs">Audio Books</span>
         </Link>
         
         <Link 

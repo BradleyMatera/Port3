@@ -21,13 +21,13 @@ export default function BottomNav() {
         </Link>
         
         <Link 
-          href="/wishlists" 
+          href="/show-search" 
           className={`flex flex-col items-center space-y-1 ${
             pathname === '/wishlists' ? 'text-white' : 'text-zinc-400'
           }`}
         >
           <Heart size={24} />
-          <span className="text-xs">Wishlists</span>
+          <span className="text-xs">Show Search</span>
         </Link>
         
         <Link 

@@ -11,13 +11,13 @@ export default function BottomNav() {
     <nav className="fixed bottom-0 w-full bg-black border-t border-zinc-800">
       <div className="flex justify-around items-center h-16">
         <Link 
-          href="/explore" 
+          href="/music-search" 
           className={`flex flex-col items-center space-y-1 ${
             pathname === '/explore' ? 'text-white' : 'text-zinc-400'
           }`}
         >
           <Search size={24} />
-          <span className="text-xs">Explore</span>
+          <span className="text-xs">Music Search</span>
         </Link>
         
         <Link 

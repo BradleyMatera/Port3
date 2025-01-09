@@ -8,9 +8,9 @@
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](https://opensource.org/licenses/MIT)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com)
 
-[Live Demo](https://spotify-profile-viewer.vercel.app) | [Report Bug](https://github.com/username/spotify-profile-viewer/issues) | [Request Feature](https://github.com/username/spotify-profile-viewer/issues)
+[Live Demo](https://port3-ten.vercel.app/) | [Report Bug](https://github.com/BradleyMatera/Port3/issues) | [Request Feature](https://github.com/BradleyMatera/Port3/issues)
 
-![Spotify Profile Viewer Demo](https://via.placeholder.com/800x400.png?text=Spotify+Profile+Viewer+Demo)
+![Spotify Profile Viewer Demo](https://raw.githubusercontent.com/BradleyMatera/Port3/refs/heads/main/Designs/Home.png)
 
 A modern, full-stack application that brings your Spotify profile to life with stunning visualizations and seamless authentication.
 
@@ -18,22 +18,41 @@ A modern, full-stack application that brings your Spotify profile to life with s
 
 ## ✨ Features
 
+## ✨ Features
+
 <table>
   <tr>
     <td>
-      <img src="https://via.placeholder.com/200x150.png?text=OAuth+Flow" alt="OAuth Flow">
-      <h3>Secure Authentication</h3>
-      <p>Seamless OAuth2 flow with automatic token refresh</p>
+      <img src="https://raw.githubusercontent.com/BradleyMatera/Port3/main/Designs/Home.png" alt="Home Page" width="200" height="150">
+      <h3>Home Page</h3>
+      <p>A modern, welcoming home page to get started with your Spotify journey.</p>
     </td>
     <td>
-      <img src="https://via.placeholder.com/200x150.png?text=Profile+View" alt="Profile View">
-      <h3>Rich Profile Data</h3>
-      <p>Comprehensive view of your Spotify profile</p>
+      <img src="https://raw.githubusercontent.com/BradleyMatera/Port3/main/Designs/Profile.png" alt="Profile View" width="200" height="150">
+      <h3>Profile View</h3>
+      <p>Access detailed insights into your Spotify profile and listening habits.</p>
     </td>
     <td>
-      <img src="https://via.placeholder.com/200x150.png?text=Analytics" alt="Analytics">
-      <h3>Visual Analytics</h3>
-      <p>Beautiful charts for your listening habits</p>
+      <img src="https://raw.githubusercontent.com/BradleyMatera/Port3/main/Designs/Music%20Search.png" alt="Music Search" width="200" height="150">
+      <h3>Music Search</h3>
+      <p>Discover new tracks and artists with a powerful search feature.</p>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <img src="https://raw.githubusercontent.com/BradleyMatera/Port3/main/Designs/Webplayer.png" alt="Web Player" width="200" height="150">
+      <h3>Web Player</h3>
+      <p>Play your favorite songs directly from the web player integration.</p>
+    </td>
+    <td>
+      <img src="https://raw.githubusercontent.com/BradleyMatera/Port3/main/Designs/Audiobooks.png" alt="Audiobooks" width="200" height="150">
+      <h3>Audiobooks</h3>
+      <p>Explore and enjoy Spotify’s audiobook collection effortlessly.</p>
+    </td>
+    <td>
+      <img src="https://raw.githubusercontent.com/BradleyMatera/Port3/main/Designs/AudioBooksSearch.png" alt="Audiobooks Search" width="200" height="150">
+      <h3>Audiobooks Search</h3>
+      <p>Search for audiobooks quickly and efficiently.</p>
     </td>
   </tr>
 </table>
@@ -137,10 +156,8 @@ sequenceDiagram
     Spotify-->>App: Access Token
 ```
 
-### 📊 Data Visualization
-![Analytics Dashboard](https://via.placeholder.com/800x400.png?text=Analytics+Dashboard)
-
 ### 🎵 Music Discovery
+
 - Top artists and tracks
 - Personalized recommendations
 - Playlist generation
@@ -159,11 +176,6 @@ sequenceDiagram
 
 </details>
 
-## 📱 Responsive Design
-
-<div align="center">
-  <img src="https://via.placeholder.com/250x500.png?text=Mobile" alt="Mobile View">
-  <img src="https://via.placeholder.com/250x500.png?text=Tablet" alt="Tablet View">
 </div>
 
 ## 🚀 Deployment
@@ -196,7 +208,7 @@ We love your input! Check out our [Contributing Guide](CONTRIBUTING.md) to get s
 
 - [x] Basic authentication
 - [x] Profile viewing
-- [x] Top tracks/artists
+- [ ] Top tracks/artists
 - [ ] Playlist management
 - [ ] Social features
 - [ ] Advanced analytics

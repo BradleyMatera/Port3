@@ -5,13 +5,13 @@ import Image from 'next/image';
 
 export default function ProfileClient({ userData }: { userData: any }) {
   const handleLogout = () => {
-    // Clear cookies
+    // Clear cookies to help with logout and redirect
     document.cookie = 'spotify_access_token=; Max-Age=0; path=/;';
     document.cookie = 'spotify_refresh_token=; Max-Age=0; path=/;';
     document.cookie = 'spotify_user=; Max-Age=0; path=/;';
-    // Clear localStorage
+    // Clear localStorage for the access token as well
     localStorage.removeItem('spotify_access_token');
-    // Redirect to login page
+    // Redirect to login page after logout
     window.location.href = '/login';
   };
 

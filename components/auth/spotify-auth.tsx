@@ -8,7 +8,7 @@ export function SpotifyAuth() {
 
     if (accessToken) {
       console.log('Spotify Access Token:', accessToken);
-      localStorage.setItem('spotify_access_token', accessToken);
+      localStorage.setItem('spotify_access_token', accessToken);// yeah i know, this is not secure, but this is just a demo
       window.location.href = '/profile'; // Redirect to profile page
     }
   }, []);

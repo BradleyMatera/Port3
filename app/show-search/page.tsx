@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 
-export default function SpotifyShowSearch() {
+export default function ShowSearchPage() {
   const [query, setQuery] = useState('');
   const [shows, setShows] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -11,57 +11,40 @@ export default function SpotifyShowSearch() {
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      // Retrieve the access token from localStorage
-      const storedToken = localStorage.getItem('spotify_access_token');
-      if (!storedToken) {
+      const token = localStorage.getItem('spotify_access_token');
+      if (!token) {
         console.error('Access token is missing or expired.');
-        redirectToLogin();
-        return;
+        window.location.href = '/login';
+      } else {
+        setAccessToken(token);
       }
-
-      // Validate token scopes
-      const requiredScopes = ['user-read-email', 'user-read-private', 'streaming'];
-      if (!validateScopes(storedToken, requiredScopes)) {
-        console.error('Access token is missing required scopes.');
-        redirectToLogin();
-        return;
-      }
-
-      // Set access token
-      setAccessToken(storedToken);
     }
   }, []);
 
-  const validateScopes = (token, requiredScopes) => {
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1])); // Decode JWT
-      const tokenScopes = payload.scope?.split(' ') || [];
-      return requiredScopes.every((scope) => tokenScopes.includes(scope));
-    } catch (error) {
-      console.error('Failed to validate token scopes:', error);
-      return false;
+  const handleSearch = async () => {
+    if (!query.trim()) {
+      setError('Please enter a search term.');
+      return;
     }
-  };
 
-  const redirectToLogin = () => {
-    // Ensure redirect happens only once to avoid infinite loops
-    if (typeof window !== 'undefined') {
+    if (!accessToken) {
+      console.error('Access token missing or expired.');
       window.location.href = '/login';
+      return;
     }
-  };
-
-  const handleSearch = async (e) => {
-    e.preventDefault();
-    if (!query.trim()) return;
 
     setLoading(true);
     setError(null);
 
     try {
       const response = await fetch(
-        `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=show&limit=10`,
+        `https://api.spotify.com/v1/search?q=${encodeURIComponent(
+          query
+        )}&type=show&limit=10`,
         {
-          headers: { Authorization: `Bearer ${accessToken}` },
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
         }
       );
 
@@ -77,7 +60,7 @@ export default function SpotifyShowSearch() {
       }
     } catch (err) {
       console.error('Error fetching shows:', err);
-      setError('An error occurred while searching for shows.');
+      setError('An error occurred while fetching shows.');
     } finally {
       setLoading(false);
     }
@@ -85,39 +68,40 @@ export default function SpotifyShowSearch() {
 
   return (
     <div className="min-h-screen bg-black text-white p-6">
-      <h1 className="text-3xl font-semibold mb-6">Spotify Show Search</h1>
+      <h1 className="text-3xl font-semibold mb-6">Search Shows</h1>
 
-      <form onSubmit={handleSearch} className="mb-6">
+      <div className="mb-4">
         <input
           type="text"
-          placeholder="Search for shows..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          className="w-full p-2 mb-4 bg-gray-800 text-white rounded"
+          placeholder="Search for shows..."
+          className="w-full p-3 text-black rounded"
         />
         <button
-          type="submit"
-          className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+          onClick={handleSearch}
+          className="mt-2 w-full bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600"
         >
           Search
         </button>
-      </form>
+      </div>
 
-      {loading && <div>Loading...</div>}
+      {loading && <div>Loading shows...</div>}
       {error && <div className="text-red-500">{error}</div>}
 
       <ul>
         {shows.map((show) => (
-          <li key={show.id} className="mb-4">
+          <li key={show.id} className="mb-6">
             <div className="flex items-center space-x-4">
               <img
                 src={show.images[0]?.url || '/placeholder-show.jpg'}
                 alt={show.name}
-                className="w-16 h-16 object-cover rounded"
+                className="w-20 h-20 object-cover rounded"
               />
               <div>
                 <p className="text-xl font-medium">{show.name}</p>
                 <p className="text-sm text-gray-400">{show.description}</p>
+                <p className="text-sm text-gray-400">Publisher: {show.publisher}</p>
               </div>
             </div>
           </li>

@@ -87,10 +87,7 @@ SPOTIFY_REDIRECT_URI=http://localhost:3001/auth/callback
 
 # Server Configuration
 PORT=3001
-MONGODB_URI=your_mongodb_connection_string
 
-# Next.js Configuration
-NEXT_PUBLIC_API_URL=http://localhost:3001
 ```
 
 ### 4. Start the Backend

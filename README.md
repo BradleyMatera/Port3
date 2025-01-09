@@ -1,464 +1,238 @@
+<div align="center">
+  
 # 🎵 Spotify Profile Viewer
 
-## 🚀 Overview
-A modern, full-stack application built with Next.js and TypeScript to authenticate with Spotify, retrieve user data, and display your profile information in a visually stunning way.
+[![Next.js](https://img.shields.io/badge/Next.js-15.0-black?style=flat&logo=next.js)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=flat&logo=typescript)](https://www.typescriptlang.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.0-38B2AC?style=flat&logo=tailwind-css)](https://tailwindcss.com/)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](https://opensource.org/licenses/MIT)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com)
 
-## 📋 Table of Contents
-- [🛠 Technology Stack](#-technology-stack)
-- [🛠 Prerequisites](#-prerequisites)
-- [💻 Installation and Setup](#-installation-and-setup)
-- [📂 Project Structure](#-project-structure)
-- [🚀 Features](#-features)
-- [🔍 Detailed Breakdown](#-detailed-breakdown)
-- [📁 Repository Setup](#-repository-setup)
-- [🔐 Authentication Flow](#-authentication-flow)
-- [🔧 Environment Configuration](#-environment-configuration)
-- [🚀 How to Extend the App](#-how-to-extend-the-app)
-- [🌐 Deployment](#-deployment)
-- [🛟 Support](#-support)
-- [📜 License](#-license)
+[Live Demo](https://spotify-profile-viewer.vercel.app) | [Report Bug](https://github.com/username/spotify-profile-viewer/issues) | [Request Feature](https://github.com/username/spotify-profile-viewer/issues)
 
-## 🛠 Technology Stack
+![Spotify Profile Viewer Demo](https://via.placeholder.com/800x400.png?text=Spotify+Profile+Viewer+Demo)
 
-### Frontend
-- **Framework:** 
-  - Next.js 15
-  - Language: TypeScript 5
+A modern, full-stack application that brings your Spotify profile to life with stunning visualizations and seamless authentication.
 
-- **UI Components:**
-  - Radix UI primitives (Accordion, Dialog, Navigation, etc.)
-  - Tailwind CSS for styling
-  - shadcn/ui components
-  - Lucide React for icons
-  - Recharts for data visualization
+</div>
 
-- **State Management & Forms:**
-  - React Hook Form with Zod validation
-  - Context API for state management
+## ✨ Features
 
-- **Styling & Utilities:**
-  - Tailwind CSS with animations
-  - Class Variance Authority
-  - clsx and tailwind-merge for class manipulation
-  - Next-themes for theme management
-  - Date Handling: date-fns
-  - Carousel: Embla Carousel
-  - Toast Notifications: Sonner
+<table>
+  <tr>
+    <td>
+      <img src="https://via.placeholder.com/200x150.png?text=OAuth+Flow" alt="OAuth Flow">
+      <h3>Secure Authentication</h3>
+      <p>Seamless OAuth2 flow with automatic token refresh</p>
+    </td>
+    <td>
+      <img src="https://via.placeholder.com/200x150.png?text=Profile+View" alt="Profile View">
+      <h3>Rich Profile Data</h3>
+      <p>Comprehensive view of your Spotify profile</p>
+    </td>
+    <td>
+      <img src="https://via.placeholder.com/200x150.png?text=Analytics" alt="Analytics">
+      <h3>Visual Analytics</h3>
+      <p>Beautiful charts for your listening habits</p>
+    </td>
+  </tr>
+</table>
 
-### Backend
-- **Runtime:** Node.js
-- **Framework:** Express.js
-- **Database:** MongoDB with Mongoose
-- **Authentication:** Custom OAuth implementation with Spotify API
-- **Middleware:**
-  - CORS for cross-origin requests
-  - Morgan for logging
-- **Environment Variables:** dotenv
-- **Networking:** Axios for HTTP requests
+## 🚀 Quick Start
 
-## 🛠 Prerequisites
+### Prerequisites
 
-Make sure you have the following installed:
-- Node.js (v16 or later) - [Download Node.js](https://nodejs.org/)
-- npm (v7 or later)
-- MongoDB - [Install MongoDB](https://www.mongodb.com/try/download/community)
-- Spotify Developer Account - [Spotify Developer Dashboard](https://developer.spotify.com/dashboard/)
+<details>
+<summary>Click to expand</summary>
 
-## 💻 Installation and Setup
+- Node.js 16+ ([Download](https://nodejs.org/))
+- npm 7+
+- MongoDB ([Install](https://www.mongodb.com/try/download/community))
+- Spotify Developer Account ([Dashboard](https://developer.spotify.com/dashboard/))
 
-### 1. Clone the Repository
+</details>
+
+### Installation
+
+1️⃣ Clone the repository
 ```bash
 git clone https://github.com/your-username/spotify-profile-viewer.git
 cd spotify-profile-viewer
 ```
 
-### 2. Install Dependencies
+2️⃣ Install dependencies
 ```bash
 npm install
 ```
 
-### 3. Configure Environment Variables
-Create a `.env` file in the root directory:
+3️⃣ Configure environment variables
 ```env
-# Spotify Configuration
 SPOTIFY_CLIENT_ID=your_client_id
 SPOTIFY_CLIENT_SECRET=your_client_secret
 SPOTIFY_REDIRECT_URI=http://localhost:3001/auth/callback
-
-# Server Configuration
-PORT=3001
 ```
 
-### 4. Start the Backend
+4️⃣ Start development servers
 ```bash
-cd server
-node server.js
-```
+# Backend
+cd server && node server.js
 
-### 5. Start the Frontend
-```bash
+# Frontend (new terminal)
 npm run dev
 ```
 
-### 6. Access the App
-Open your browser and navigate to: `http://localhost:3000`
+## 🛠️ Tech Stack
 
-## 📂 Project Structure
+<details>
+<summary><b>Frontend</b></summary>
+
+- **Framework:** Next.js 15 with TypeScript 5
+- **UI Components:** 
+  - Radix UI primitives
+  - shadcn/ui components
+  - Tailwind CSS
+  - Lucide React icons
+- **State & Forms:** React Hook Form + Zod
+- **Data Visualization:** Recharts
+- **Theme:** Next-themes
+- **Utils:** date-fns, Embla Carousel
+
+</details>
+
+<details>
+<summary><b>Backend</b></summary>
+
+- **Runtime:** Node.js with Express
+- **Database:** MongoDB + Mongoose
+- **Auth:** Custom OAuth implementation
+- **Networking:** Axios
+- **Logging:** Morgan
+
+</details>
+
+## 📦 Project Structure
+
 ```
-.
-├── app
-│   ├── api
-│   │   └── auth
-│   │       ├── callback/route.ts
-│   │       ├── spotify/route.ts
-│   │       └── user/route.ts
-│   ├── profile
-│   │   ├── page.tsx
-│   │   └── profile-client.tsx
-│   ├── login/page.tsx
-│   ├── layout.tsx
-│   ├── globals.css
-├── components
-│   ├── auth/spotify-auth.tsx
-│   ├── ui/button.tsx
-├── server
-│   ├── routes/auth.js
-│   ├── server.js
-├── public
-│   ├── placeholder-user.jpg
-│   ├── spotify-logo.svg
-├── styles/globals.css
-├── .env
-├── README.md
-└── package.json
-```
-
-## 🚀 Features
-
-### Current Features
-1. **Spotify Authentication:** 
-   - Secure OAuth2 flow with Spotify
-   - JWT token management
-   - Automatic token refresh
-
-2. **User Profile:** 
-   - Display of user's Spotify profile information
-   - Profile image display
-   - Account details and statistics
-
-3. **Top Artists:** 
-   - Shows user's top 5 most listened-to artists
-   - Artist images and genres
-   - Popularity metrics
-
-4. **Top Tracks:** 
-   - Displays user's top 5 most played tracks
-   - Track details and album art
-   - Audio preview integration
-
-5. **Error Handling:** 
-   - Comprehensive error handling for API failures
-   - User-friendly error messages
-   - Automatic retry mechanisms
-
-6. **Navigation:** 
-   - Easy navigation between pages
-   - Home and logout options
-   - Breadcrumb navigation
-
-7. **Responsive Design:** 
-   - Mobile-friendly layout with grid system
-   - Adaptive UI components
-   - Cross-browser compatibility
-
-## 🔍 Detailed Breakdown
-
-### Authentication Flow
-**File:** `api/auth/spotify/route.ts`  
-**Purpose:** Redirects the user to Spotify's authorization endpoint.
-
-```typescript
-const spotifyAuthUrl = `https://accounts.spotify.com/authorize?response_type=code&client_id=${client_id}&redirect_uri=${encodeURIComponent(
-  redirect_uri
-)}&state=${state}&scope=${encodeURIComponent(scope)}`;
+spotify-profile-viewer/
+├── app/                    # Next.js application
+│   ├── api/               # API routes
+│   ├── profile/          # Profile pages
+│   └── login/            # Authentication
+├── components/            # React components
+├── server/               # Backend server
+└── public/               # Static assets
 ```
 
-### Callback Handler
-**File:** `api/auth/callback/route.ts`
-```typescript
-export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const code = searchParams.get('code');
-  const state = searchParams.get('state');
+## 🎯 Core Features
 
-  if (!code || !state) {
-    return new Response('Missing code or state', { status: 400 });
-  }
-
-  const tokenResponse = await fetch('https://accounts.spotify.com/api/token', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-      Authorization: `Basic ${Buffer.from(`${client_id}:${client_secret}`).toString('base64')}`,
-    },
-    body: new URLSearchParams({
-      code,
-      redirect_uri,
-      grant_type: 'authorization_code',
-    }),
-  });
-
-  const { access_token, refresh_token } = await tokenResponse.json();
-  
-  await cookieStore.set('spotify_access_token', access_token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    maxAge: 3600,
-  });
-
-  return Response.redirect('/profile');
-}
+### 🔐 Authentication Flow
+```mermaid
+sequenceDiagram
+    User->>App: Click Login
+    App->>Spotify: Request Auth
+    Spotify-->>User: Auth Prompt
+    User->>Spotify: Approve
+    Spotify-->>App: Auth Code
+    App->>Spotify: Exchange Token
+    Spotify-->>App: Access Token
 ```
 
-### Profile Data Retrieval
-**File:** `app/profile/page.tsx`  
-```typescript
-useEffect(() => {
-  const accessToken = localStorage.getItem('spotify_access_token');
-  if (!accessToken) return (window.location.href = '/login');
+### 📊 Data Visualization
+![Analytics Dashboard](https://via.placeholder.com/800x400.png?text=Analytics+Dashboard)
 
-  fetch('https://api.spotify.com/v1/me', {
-    headers: { Authorization: `Bearer ${accessToken}` },
-  })
-    .then((res) => res.json())
-    .then(setUserData)
-    .catch(() => window.location.href = '/login');
-}, []);
+### 🎵 Music Discovery
+- Top artists and tracks
+- Personalized recommendations
+- Playlist generation
 
-// Top Artists Fetch
-fetch('https://api.spotify.com/v1/me/top/artists?limit=5', {
-  headers: { Authorization: `Bearer ${accessToken}` },
-})
-  .then((res) => res.json())
-  .then(setTopArtists);
+## 🔄 API Integration
 
-// Top Tracks Fetch
-fetch('https://api.spotify.com/v1/me/top/tracks?limit=5', {
-  headers: { Authorization: `Bearer ${accessToken}` },
-})
-  .then((res) => res.json())
-  .then(setTopTracks);
-```
+<details>
+<summary>Available Endpoints</summary>
 
-### Error Handling
-**File:** `app/profile/page.tsx`  
-```typescript
-if (error) {
-  return (
-    <div className="p-4">
-      <h1 className="text-red-500">Error: {error}</h1>
-      <button 
-        onClick={handleLogout} 
-        className="mt-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
-      >
-        Return to Login
-      </button>
-    </div>
-  );
-}
-```
+| Endpoint | Method | Description |
+|----------|---------|-------------|
+| `/api/auth/spotify` | GET | Initiate Spotify OAuth |
+| `/api/auth/callback` | GET | OAuth callback handler |
+| `/api/profile` | GET | Get user profile |
+| `/api/top-tracks` | GET | Get user's top tracks |
 
-### Search Results Component
-**File:** `app/search/page.tsx`
-```typescript
-if (searchResults.length === 0) {
-  return (
-    <div className="flex flex-col items-center justify-center p-8">
-      <p className="text-gray-400 text-lg">No results found. Try a different search.</p>
-      <button 
-        onClick={() => setSearchQuery('')}
-        className="mt-4 px-6 py-2 bg-green-500 text-white rounded-full hover:bg-green-600"
-      >
-        Clear Search
-      </button>
-    </div>
-  );
-}
-```
+</details>
 
-## 📁 Repository Setup
-- **Repository Type:** Public
-- **Source Code Location:** `/Users/bradleymatera/Desktop/Port3`
-- **Key Files:**
-  ```
-  - README.md: Technical documentation
-  - .env: Sensitive credentials
-  - package.json: Dependencies and scripts
-  - tsconfig.json: TypeScript configuration
-  ```
-- **Branching Strategy:** Feature-based branching with main branch protection
+## 📱 Responsive Design
 
-## 🔐 Authentication Flow
+<div align="center">
+  <img src="https://via.placeholder.com/250x500.png?text=Mobile" alt="Mobile View">
+  <img src="https://via.placeholder.com/250x500.png?text=Tablet" alt="Tablet View">
+</div>
 
-### Login Flow Implementation
-```typescript
-// login/page.tsx
-export default function LoginPage() {
-  return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="p-8 bg-white rounded-lg shadow-md">
-        <h1 className="text-2xl font-bold mb-6">Login to Spotify Profile Viewer</h1>
-        <a 
-          href={redirectUri}
-          className="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg block text-center"
-        >
-          Login with Spotify
-        </a>
-      </div>
-    </div>
-  );
-}
-```
+## 🚀 Deployment
 
-### Token Management
-```typescript
-// api/auth/callback/route.ts
-async function handleTokenRefresh(refresh_token: string) {
-  const response = await fetch('https://accounts.spotify.com/api/token', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-      Authorization: `Basic ${Buffer.from(`${client_id}:${client_secret}`).toString('base64')}`,
-    },
-    body: new URLSearchParams({
-      grant_type: 'refresh_token',
-      refresh_token,
-    }),
-  });
+### Vercel Deployment
 
-  const data = await response.json();
-  return data.access_token;
-}
-```
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/git/external?repository-url=https://github.com/username/spotify-profile-viewer)
 
-## 🔧 Environment Configuration
-```env
-# Spotify Configuration
-SPOTIFY_CLIENT_ID=ea84c26d908148c488c45dd2a2afcac8
-SPOTIFY_CLIENT_SECRET=d31fea65986f4e558de97c0bef843915
-SPOTIFY_REDIRECT_URI=http://localhost:3001/auth/callback
+1. Click the "Deploy" button
+2. Connect your GitHub repository
+3. Configure environment variables
+4. Deploy!
 
-# Server Configuration
-PORT=3001
-MONGODB_URI=mongodb://localhost:27017/spotify-profile
-NODE_ENV=development
+## 🤝 Contributing
 
-# Security
-JWT_SECRET=your-jwt-secret-key
-COOKIE_SECRET=your-cookie-secret
-```
+We love your input! Check out our [Contributing Guide](CONTRIBUTING.md) to get started.
 
-## 🚀 How to Extend the App
+<details>
+<summary>Development Process</summary>
 
-### Additional Features
-1. **Playlist Management:**
-   ```typescript
-   async function createPlaylist(name: string, tracks: string[]) {
-     const response = await fetch(`https://api.spotify.com/v1/me/playlists`, {
-       method: 'POST',
-       headers: {
-         Authorization: `Bearer ${accessToken}`,
-         'Content-Type': 'application/json',
-       },
-       body: JSON.stringify({
-         name,
-         public: false,
-         description: 'Created with Spotify Profile Viewer',
-       }),
-     });
-     
-     const playlist = await response.json();
-     return playlist;
-   }
-   ```
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
-2. **Playback Controls:**
-   ```typescript
-   const SpotifyPlayer = () => {
-     const [player, setPlayer] = useState(null);
-     
-     useEffect(() => {
-       const script = document.createElement('script');
-       script.src = 'https://sdk.scdn.co/spotify-player.js';
-       document.body.appendChild(script);
-       
-       window.onSpotifyWebPlaybackSDKReady = () => {
-         const player = new Spotify.Player({
-           name: 'Spotify Profile Viewer Player',
-           getOAuthToken: cb => cb(accessToken),
-         });
-         setPlayer(player);
-       };
-     }, []);
-     
-     return (
-       // Player UI Components
-     );
-   };
-   ```
+</details>
 
-3. **Recently Played:**
-   ```typescript
-   async function getRecentlyPlayed() {
-     const response = await fetch('https://api.spotify.com/v1/me/player/recently-played', {
-       headers: { Authorization: `Bearer ${accessToken}` },
-     });
-     return await response.json();
-   }
-   ```
+## 📈 Project Roadmap
 
-## 🌐 Deployment
+- [x] Basic authentication
+- [x] Profile viewing
+- [x] Top tracks/artists
+- [ ] Playlist management
+- [ ] Social features
+- [ ] Advanced analytics
 
-### Vercel Deployment Steps
+## 🙋 FAQ
 
-1. **Build Configuration**
-   ```json
-   {
-     "version": 2,
-     "builds": [
-       {
-         "src": "package.json",
-         "use": "@vercel/next"
-       }
-     ]
-   }
-   ```
+<details>
+<summary><b>How do I get Spotify API credentials?</b></summary>
+1. Go to Spotify Developer Dashboard
+2. Create a new application
+3. Copy Client ID and Secret
+4. Configure redirect URI
+</details>
 
-2. **Environment Setup**
-   ```bash
-   vercel env add SPOTIFY_CLIENT_ID
-   vercel env add SPOTIFY_CLIENT_SECRET
-   vercel env add SPOTIFY_REDIRECT_URI
-   ```
+<details>
+<summary><b>Can I use this with my free Spotify account?</b></summary>
+Yes! The app works with both Free and Premium Spotify accounts, though some features may be limited with Free accounts.
+</details>
 
-3. **Deploy Command**
-   ```bash
-   npm run build
-   npx vercel --prod
-   ```
+## 📄 License
 
-## 📊 Project Milestones
-1. **Week 1:** Project setup, environment configuration, authentication
-2. **Week 2:** Search functionality and linking results to Spotify Web Player
-3. **Week 3:** Profile management and JWT integration
-4. **Week 4:** Final testing and deployment
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🛟 Support
-For support, please create an issue in the GitHub repository or contact the development team at support@example.com.
+## 🙏 Acknowledgments
 
-## 📜 License
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+- [Spotify Web API](https://developer.spotify.com/documentation/web-api/)
+- [Next.js Team](https://nextjs.org/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [shadcn/ui](https://ui.shadcn.com/)
 
 ---
 
-Built with ❤️ using Next.js, TypeScript, Tailwind CSS, and Spotify API.
+<div align="center">
+
+Made with ❤️ by [Bradely Matera](https://github.com/BradleyMatera)
+
+⭐️ Star us on GitHub — it helps!
+
+</div>

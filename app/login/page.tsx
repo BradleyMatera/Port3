@@ -1,5 +1,5 @@
 export default function Login() {
-  const redirectUri = '/api/auth/spotify'; // Ensure this matches your `/spotify` route.
+  const redirectUri = '/api/auth/spotify';
 
   return (
     <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center">

@@ -89,6 +89,8 @@ npm install
 SPOTIFY_CLIENT_ID=your_client_id
 SPOTIFY_CLIENT_SECRET=your_client_secret
 SPOTIFY_REDIRECT_URI=http://localhost:3001/auth/callback
+PORT=3001
+
 ```
 
 4️⃣ Start development servers

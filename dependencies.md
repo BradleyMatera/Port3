@@ -82,3 +82,30 @@ L2 --> L2A["module.exports = {...};"]
 L --> M1[./README.md]
 J --> J1[./Designs/Home.png]
 ```
+
+# Project Structure Documentation
+
+## File Organization Overview
+
+1. **Main Files in the Project**
+   * The top-level node represents all the primary files and directories in your project, like app, components, server, and lib. Each file is shown as a node, with arrows pointing to other files it depends on.
+
+2. **App Directory**
+   * This is the main entry point for your Next.js application. For instance:
+   * app/music-search/page.tsx depends on React imports like useState and useEffect, and components like Button from the UI folder.
+   * app/profile/profile-client.tsx uses external libraries like lucide-react and next/image to render user data.
+
+3. **Component Dependencies**
+   * Components like bottom-nav.tsx are imported across multiple files (e.g., in app/profile/page.tsx and app/layout.tsx). This shows shared UI elements, such as the bottom navigation bar, being reused throughout the project.
+
+4. **Backend Connections**
+   * In the server folder, files like authentication_controller.js interact with routes/auth.js to manage authentication logic. These are tightly coupled with environment variables (SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET) defined in .env.
+
+5. **Utility Files**
+   * Shared logic, like generating random strings or utility functions, is stored in the utils folder. These utilities are imported wherever needed, ensuring code reusability.
+
+6. **Public Assets**
+   * Static files (e.g., images and logos in the public folder) are referenced by UI components and rendered directly in the app.
+
+7. **Frontend and Backend Interactions**
+   * The app/api/auth/spotify/route.ts file connects the frontend to Spotify's API for authentication. It ensures the app and backend communicate seamlessly.

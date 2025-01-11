@@ -159,9 +159,42 @@ sequenceDiagram
     App->>LocalStorage: Store Access Token
     App->>Spotify API: Make Authenticated Requests
     Spotify API-->>App: Respond with User Data
+
 ```
 
+# Spotify Authentication Flow Documentation
 
+## Process Overview
+
+1. **User Initiates Login**
+   * The user clicks the "Login with Spotify" button on the app's interface. This action triggers the authentication process.
+
+2. **App Requests Authentication**
+   * The app sends a request to the API endpoint `/api/auth/spotify`, which initiates the OAuth process.
+
+3. **API Communicates with Spotify**
+   * The API forwards a request to Spotify's authentication URL. This request includes key details like the Client ID, Redirect URI, requested scope (permissions), and a randomly generated state to prevent CSRF attacks.
+
+4. **Spotify Prompts the User**
+   * Spotify displays an authentication screen asking the user to approve the app's access to their account. This typically includes permissions to view profile data, playback, or playlists.
+
+5. **User Approves Access**
+   * The user grants permission, confirming the app's requested access.
+
+6. **Spotify Sends an Authorization Code**
+   * Spotify sends an auth code to the API via the callback URL. This code is temporary and needs to be exchanged for a token.
+
+7. **API Exchanges Code for Token**
+   * The API sends the auth code to Spotify in exchange for an access token. The token allows the app to make authorized requests on behalf of the user.
+
+8. **Spotify Responds with Access Token**
+   * Spotify returns the access token (and sometimes a refresh token) to the API. This token is the key to accessing Spotify's data.
+
+9. **App Stores the Token**
+   * The app saves the token (e.g., in localStorage) for subsequent API calls. This step prevents the need for the user to log in repeatedly.
+
+10. **Authenticated Requests to Spotify API**
+    * The app uses the access token to fetch user-specific data, like their profile, playlists, or top tracks, and displays it on the interface.
 
 ### 🎵 Music Discovery
 

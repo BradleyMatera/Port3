@@ -1,134 +1,96 @@
 'use client';
 
+import { useSession, signIn } from 'next-auth/react';
 import { useEffect, useState } from 'react';
-import { BottomNav } from '@/components/layout/bottom-nav'; // Ensure the import path is correct
-import { useRouter } from 'next/navigation';
+import ProfileClient from './profile-client';
 
 export default function Profile() {
-  const [userData, setUserData] = useState(null); // State to store Spotify user profile data
-  const router = useRouter(); // Next.js router for navigation
+  const { data: session } = useSession();
+  const [userData, setUserData] = useState(null);
+  const [playlists, setPlaylists] = useState([]);
+  const [topTracks, setTopTracks] = useState([]);
+  const [topArtists, setTopArtists] = useState([]);
+  const [recentlyPlayed, setRecentlyPlayed] = useState([]);
+  const [error, setError] = useState(null);
 
-  /**
-   * On component mount, check for an access token.
-   * Fetch the user's profile data from Spotify's API if authenticated.
-   */
   useEffect(() => {
-    const urlToken = new URLSearchParams(window.location.search).get('access_token'); // Token from URL
-    const localToken = localStorage.getItem('spotify_access_token'); // Token from local storage
-    const accessToken = urlToken || localToken;
+    const fetchData = async () => {
+      if (session?.accessToken) {
+        try {
+          // Fetch User Data
+          const userResponse = await fetch('https://api.spotify.com/v1/me', {
+            headers: { Authorization: `Bearer ${session.accessToken}` },
+          });
+          setUserData(await userResponse.json());
 
-    if (urlToken) {
-      localStorage.setItem('spotify_access_token', urlToken); // Save token from URL to local storage
-    }
+          // Fetch Playlists
+          const playlistsResponse = await fetch('https://api.spotify.com/v1/me/playlists', {
+            headers: { Authorization: `Bearer ${session.accessToken}` },
+          });
+          setPlaylists((await playlistsResponse.json()).items || []);
 
-    if (accessToken) {
-      fetch('https://api.spotify.com/v1/me', {
-        headers: {
-          Authorization: `Bearer ${accessToken}`, // Pass the token in the Authorization header
-        },
-      })
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error('Failed to fetch user data'); // Handle non-OK responses
-          }
-          return response.json();
-        })
-        .then((data) => setUserData(data)) // Set fetched user data in state
-        .catch((error) => {
-          console.error('Error fetching user data:', error);
-          localStorage.removeItem('spotify_access_token'); // Remove invalid token
-          window.location.href = '/login'; // Redirect to login page
-        });
-    } else {
-      window.location.href = '/login'; // Redirect if no token is available
-    }
-  }, []);
+          // Fetch Top Tracks
+          const topTracksResponse = await fetch('https://api.spotify.com/v1/me/top/tracks', {
+            headers: { Authorization: `Bearer ${session.accessToken}` },
+          });
+          setTopTracks((await topTracksResponse.json()).items || []);
 
-  /**
-   * Logout handler to clear tokens and redirect to the login page.
-   */
-  const handleLogout = () => {
-    localStorage.removeItem('spotify_access_token'); // Clear local storage token
-    document.cookie = 'spotify_access_token=; Max-Age=0; path=/;'; // Clear access token cookie
-    document.cookie = 'spotify_refresh_token=; Max-Age=0; path=/;'; // Clear refresh token cookie
-    router.push('/login'); // Redirect to login page
-  };
+          // Fetch Top Artists
+          const topArtistsResponse = await fetch('https://api.spotify.com/v1/me/top/artists', {
+            headers: { Authorization: `Bearer ${session.accessToken}` },
+          });
+          setTopArtists((await topArtistsResponse.json()).items || []);
 
-  // Show loading state if user data is not available yet
-  if (!userData) {
+          // Fetch Recently Played Tracks
+          const recentlyPlayedResponse = await fetch('https://api.spotify.com/v1/me/player/recently-played', {
+            headers: { Authorization: `Bearer ${session.accessToken}` },
+          });
+          setRecentlyPlayed((await recentlyPlayedResponse.json()).items || []);
+        } catch (err) {
+          setError(err.message);
+        }
+      }
+    };
+
+    fetchData();
+  }, [session]);
+
+  if (!session) {
     return (
       <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center">
-        <p className="text-zinc-400">Loading your Spotify profile...</p>
+        <h1 className="text-3xl font-bold mb-6">You are not signed in</h1>
+        <button
+          onClick={() => signIn('spotify')}
+          className="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg"
+        >
+          Sign in with Spotify
+        </button>
       </div>
     );
   }
 
-  // Destructure user profile data for display
-  const {
-    display_name,
-    email,
-    images,
-    id,
-    uri,
-    href,
-    followers,
-    explicit_content,
-    country,
-    product,
-  } = userData;
+  if (error) {
+    return (
+      <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center">
+        <h1 className="text-2xl font-bold text-red-500">Error</h1>
+        <p>{error}</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-black text-white flex flex-col">
-      <div className="flex-grow p-6">
-        <h1 className="text-3xl font-bold mb-4">Your Spotify Profile</h1>
-        <div className="flex items-center mb-6">
-          <img
-            src={images?.[0]?.url || '/placeholder-user.jpg'} // Use placeholder if no image
-            alt="Profile"
-            className="w-32 h-32 rounded-full bg-gray-800"
-          />
-          <div className="ml-4">
-            <h2 className="text-2xl font-semibold">{display_name}</h2>
-            <p className="text-gray-400">{email}</p>
-          </div>
-        </div>
-        {/* Display user information */}
-        <ul className="space-y-2">
-          <li><strong>User ID:</strong> {id}</li>
-          <li><strong>Email:</strong> {email}</li>
-          <li><strong>Country:</strong> {country}</li>
-          <li><strong>Subscription:</strong> {product}</li>
-          <li><strong>Followers:</strong> {followers?.total || 0}</li>
-          <li>
-            <strong>Profile URI:</strong>{' '}
-            <a href={uri} className="text-green-500">{uri}</a>
-          </li>
-          <li>
-            <strong>API Link:</strong>{' '}
-            <a href={href} className="text-green-500">{href}</a>
-          </li>
-          <li>
-            <strong>Explicit Content Filter:</strong>{' '}
-            {explicit_content?.filter_enabled ? 'Enabled' : 'Disabled'}
-          </li>
-        </ul>
-        {/* Buttons for navigation and logout */}
-        <div className="flex gap-4 mt-6">
-          <button
-            onClick={() => router.push('/')} // Redirect to homepage
-            className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg"
-          >
-            Go Back to Home
-          </button>
-          <button
-            onClick={handleLogout} // Logout button
-            className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg"
-          >
-            Logout
-          </button>
-        </div>
-      </div>
-      <BottomNav /> {/* Include bottom navigation */}
+    <div className="min-h-screen bg-black text-white">
+      {userData ? (
+        <ProfileClient
+          userData={userData}
+          playlists={playlists}
+          topTracks={topTracks}
+          topArtists={topArtists}
+          recentlyPlayed={recentlyPlayed}
+        />
+      ) : (
+        <div className="flex items-center justify-center h-full">Loading profile...</div>
+      )}
     </div>
   );
 }

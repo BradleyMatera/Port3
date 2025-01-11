@@ -1,35 +1,32 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { useSession, signIn } from 'next-auth/react';
 
 export default function ShowSearchPage() {
+  const { data: session } = useSession();
   const [query, setQuery] = useState('');
   const [shows, setShows] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [accessToken, setAccessToken] = useState(null);
 
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('spotify_access_token');
-      if (!token) {
-        console.error('Access token is missing or expired.');
-        window.location.href = '/login';
-      } else {
-        setAccessToken(token);
-      }
-    }
-  }, []);
+  if (!session) {
+    return (
+      <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center">
+        <h1 className="text-3xl font-bold mb-6">You are not signed in</h1>
+        <button
+          onClick={() => signIn('spotify')}
+          className="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg"
+        >
+          Sign in with Spotify
+        </button>
+      </div>
+    );
+  }
 
   const handleSearch = async () => {
     if (!query.trim()) {
       setError('Please enter a search term.');
-      return;
-    }
-
-    if (!accessToken) {
-      console.error('Access token missing or expired.');
-      window.location.href = '/login';
       return;
     }
 
@@ -43,21 +40,24 @@ export default function ShowSearchPage() {
         )}&type=show&limit=10`,
         {
           headers: {
-            Authorization: `Bearer ${accessToken}`,
+            Authorization: `Bearer ${session.accessToken}`,
           },
         }
       );
 
-      if (response.ok) {
-        const data = await response.json();
-        setShows(data.shows?.items || []);
-      } else if (response.status === 403) {
-        console.error('Permission denied. Ensure proper scopes.');
-        setError('Permission denied. Check your Spotify scopes.');
-      } else {
-        console.error('Failed to fetch shows:', response.status);
-        setError(`Failed to fetch shows. Status: ${response.status}`);
+      if (!response.ok) {
+        const errorData = await response.json();
+        if (response.status === 403) {
+          setError('Permission denied. Check your Spotify scopes.');
+        } else {
+          setError(`Failed to fetch shows. Status: ${response.status}`);
+        }
+        console.error('Error fetching shows:', response.status, errorData);
+        return;
       }
+
+      const data = await response.json();
+      setShows(data.shows?.items || []);
     } catch (err) {
       console.error('Error fetching shows:', err);
       setError('An error occurred while fetching shows.');

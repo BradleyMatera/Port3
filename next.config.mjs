@@ -9,12 +9,6 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  experimental: {
-    // Disable experimental features
-    // webpackBuildWorker: false,
-    // parallelServerBuildTraces: false,
-    // parallelServerCompiles: false,
-  },
 };
 
 export default nextConfig;

@@ -147,14 +147,21 @@ spotify-profile-viewer/
 ### 🔐 Authentication Flow
 ```mermaid
 sequenceDiagram
-    User->>App: Click Login
-    App->>Spotify: Request Auth
-    Spotify-->>User: Auth Prompt
-    User->>Spotify: Approve
-    Spotify-->>App: Auth Code
-    App->>Spotify: Exchange Token
-    Spotify-->>App: Access Token
+    User->>App: Click "Login with Spotify"
+    App->>API: Redirect to `/api/auth/spotify`
+    API->>Spotify: Request Auth (Client ID, Redirect URI, Scope, State)
+    Spotify-->>User: Display Auth Prompt
+    User->>Spotify: Approve Access
+    Spotify-->>API: Return Auth Code via Callback
+    API->>Spotify: Exchange Auth Code for Access Token
+    Spotify-->>API: Respond with Access Token
+    API-->>App: Forward Access Token
+    App->>LocalStorage: Store Access Token
+    App->>Spotify API: Make Authenticated Requests
+    Spotify API-->>App: Respond with User Data
 ```
+
+
 
 ### 🎵 Music Discovery
 

@@ -1,17 +1,26 @@
 'use client';
 
-import { ChevronRight } from 'lucide-react';
-import Image from 'next/image';
+import { ChevronRight } from 'lucide-react'; // Icon library for UI enhancement
+import Image from 'next/image'; // Optimized image rendering in Next.js
 
+/**
+ * ProfileClient Component
+ * This component renders the user's Spotify profile details and provides logout functionality.
+ * @param {object} userData - The user data fetched from Spotify's API.
+ */
 export default function ProfileClient({ userData }: { userData: any }) {
+  /**
+   * Logout Handler
+   * Clears cookies and localStorage to remove Spotify access tokens and redirects to the login page.
+   */
   const handleLogout = () => {
-    // Clear cookies to help with logout and redirect
+    // Clear cookies
     document.cookie = 'spotify_access_token=; Max-Age=0; path=/;';
     document.cookie = 'spotify_refresh_token=; Max-Age=0; path=/;';
     document.cookie = 'spotify_user=; Max-Age=0; path=/;';
-    // Clear localStorage for the access token as well
+    // Clear localStorage
     localStorage.removeItem('spotify_access_token');
-    // Redirect to login page after logout
+    // Redirect to login page
     window.location.href = '/login';
   };
 
@@ -20,9 +29,10 @@ export default function ProfileClient({ userData }: { userData: any }) {
       <div className="p-6 space-y-6">
         {userData ? (
           <>
+            {/* Profile Header */}
             <div className="flex items-center space-x-4">
               <Image
-                src={userData.images?.[0]?.url || '/placeholder.svg'}
+                src={userData.images?.[0]?.url || '/placeholder.svg'} // Fallback image if no profile image is available
                 alt="Profile"
                 width={64}
                 height={64}
@@ -33,10 +43,16 @@ export default function ProfileClient({ userData }: { userData: any }) {
                 <p className="text-zinc-400">{userData.email}</p>
               </div>
             </div>
+
+            {/* Spotify Data Section */}
             <section>
               <h2 className="text-lg font-medium">Spotify Data</h2>
-              <pre className="bg-zinc-900 p-4 rounded">{JSON.stringify(userData, null, 2)}</pre>
+              <pre className="bg-zinc-900 p-4 rounded">
+                {JSON.stringify(userData, null, 2)} {/* Display raw JSON data for reference */}
+              </pre>
             </section>
+
+            {/* Logout Button */}
             <button
               onClick={handleLogout}
               className="mt-6 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg"
@@ -45,6 +61,7 @@ export default function ProfileClient({ userData }: { userData: any }) {
             </button>
           </>
         ) : (
+          // Login Prompt
           <div className="text-center">
             <p className="text-zinc-400 mb-4">Please log in to view your Spotify profile.</p>
             <button

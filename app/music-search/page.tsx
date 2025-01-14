@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 export default function MusicSearch() {
   const { data: session } = useSession();
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState([]);
+  const [searchResults, setSearchResults] = useState<any[]>([]);
 
   if (!session) {
     return (
@@ -78,7 +78,7 @@ export default function MusicSearch() {
                 />
                 <h3 className="text-lg font-medium">{item.name}</h3>
                 <p className="text-zinc-400">
-                  {item.artists.map((artist) => artist.name).join(', ')}
+                  {item.artists.map((artist: { name: string }) => artist.name).join(', ')}
                 </p>
               </div>
             ))}

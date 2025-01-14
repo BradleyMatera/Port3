@@ -2,13 +2,28 @@
 
 import { useState } from 'react';
 import { useSession, signIn } from 'next-auth/react';
+import { Session } from 'next-auth';
+
+declare module 'next-auth' {
+  interface Session {
+    accessToken?: string;
+  }
+}
 
 export default function ShowSearchPage() {
   const { data: session } = useSession();
   const [query, setQuery] = useState('');
-  const [shows, setShows] = useState([]);
+  interface Show {
+    id: string;
+    name: string;
+    description: string;
+    publisher: string;
+    images: { url: string }[];
+  }
+
+  const [shows, setShows] = useState<Show[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   if (!session) {
     return (

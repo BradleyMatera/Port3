@@ -2,7 +2,40 @@
 
 import Image from 'next/image';
 
-export default function ProfileClient({ userData, playlists, topTracks, topArtists, recentlyPlayed }) {
+interface UserData {
+  display_name: string;
+  email: string;
+  country: string;
+  followers: { total: number };
+  product: string;
+  images?: { url: string }[];
+}
+
+interface Playlist {
+  id: string;
+  name: string;
+  images?: { url: string }[];
+}
+
+interface Track {
+  id: string;
+  name: string;
+  artists: { name: string }[];
+}
+
+interface RecentlyPlayedItem {
+  track: Track;
+}
+
+interface ProfileClientProps {
+  userData: UserData;
+  playlists: Playlist[];
+  topTracks: Track[];
+  topArtists: { id: string; name: string }[];
+  recentlyPlayed: RecentlyPlayedItem[];
+}
+
+export default function ProfileClient({ userData, playlists, topTracks, topArtists, recentlyPlayed }: ProfileClientProps) {
   const handleLogout = () => {
     document.cookie = 'spotify_access_token=; Max-Age=0; path=/;';
     localStorage.removeItem('spotify_access_token');

@@ -47,7 +47,7 @@ export default function Profile() {
           });
           setRecentlyPlayed((await recentlyPlayedResponse.json()).items || []);
         } catch (err) {
-          setError(err.message);
+          setError((err as any).message);
         }
       }
     };

@@ -1,3 +1,5 @@
+"use client";
+
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -8,7 +10,7 @@ export default function Home() {
       {/* Logo Section */}
       <div className="w-16 h-16 mb-8">
         <Image
-          src="/spotify-logo.svg"
+          src="/images/logo.svg"
           alt="Spotify Logo"
           width={64}
           height={64}

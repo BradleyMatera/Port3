@@ -6,9 +6,9 @@ import { useSession, signIn } from 'next-auth/react';
 export default function AudiobooksSearchPage() {
   const { data: session } = useSession();
   const [query, setQuery] = useState('');
-  const [audiobooks, setAudiobooks] = useState([]);
+  const [audiobooks, setAudiobooks] = useState<{ id: string; name: string; images: { url: string }[]; authors: { name: string }[]; narrators: { name: string }[] }[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   if (!session) {
     return (

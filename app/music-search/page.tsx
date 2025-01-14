@@ -79,6 +79,7 @@ export default function MusicSearch() {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Search for songs, artists, albums..."
+          aria-label="Search for music"
           className="w-full max-w-xl p-4 bg-zinc-800 text-white text-lg rounded-lg placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-primary"
         />
         <Button
@@ -89,8 +90,7 @@ export default function MusicSearch() {
         </Button>
       </div>
 
-      {/* Loading and Error States */}
-      {loading && <p className="text-center text-white text-lg">Loading music...</p>}
+      {/* Error States */}
       {error && <p className="text-center text-red-500 text-lg">{error}</p>}
 
       {/* Search Results */}
@@ -106,17 +106,19 @@ export default function MusicSearch() {
                 alt={item.name}
                 className="w-full h-48 object-cover rounded-lg mb-4"
               />
-              <h3 className="text-xl font-semibold text-white">{item.name}</h3>
+              <h3 className="text-xl font-semibold text-white">{item.name || 'Unknown Track'}</h3>
               <p className="text-zinc-400 text-sm">
-                {item.artists.map((artist: { name: string }) => artist.name).join(', ')}
+                {item.artists?.map((artist: { name: string }) => artist.name).join(', ') || 'Unknown Artist'}
               </p>
             </Card>
           ))}
         </div>
       ) : (
-        <p className="text-center text-zinc-400 text-lg mt-12">
-          No results found. Try searching for something else!
-        </p>
+        !loading && !error && (
+          <p className="text-center text-zinc-400 text-lg mt-12">
+            No results found. Try searching for something else!
+          </p>
+        )
       )}
 
       {/* Logout Button */}

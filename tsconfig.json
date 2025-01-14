@@ -1,28 +1,55 @@
 {
   "compilerOptions": {
+    // Specify library files to include in the compilation
     "lib": ["dom", "dom.iterable", "esnext"],
+    // Allow JavaScript files to be compiled
     "allowJs": true,
+    // Set the target ECMAScript version
     "target": "ES6",
+    // Skip type checking of declaration files
     "skipLibCheck": true,
+    // Enable strict type-checking options
     "strict": true,
+    // Prevent emitting files from the TypeScript compiler
     "noEmit": true,
+    // Enable interoperability between CommonJS and ES Modules
     "esModuleInterop": true,
+    // Specify module code generation
     "module": "esnext",
+    // Specify module resolution strategy
     "moduleResolution": "bundler",
+    // Allow importing .json files
     "resolveJsonModule": true,
+    // Treat each file as a separate module
     "isolatedModules": true,
+    // Set the JSX mode for the project
     "jsx": "preserve",
+    // Specify type declaration files to include
+    "typeRoots": ["./types", "./node_modules/@types"],
+    // Specify files to be included in the compilation
+    "include": ["**/*.ts", "**/*.tsx"],
+    // Enable incremental compilation for faster builds
     "incremental": true,
+    // Enable plugins for TypeScript tooling
     "plugins": [
       {
         "name": "next"
       }
     ],
+    // Define path aliases for cleaner imports
     "paths": {
       "@/*": ["./*"]
     },
+    // Enforce consistent casing in file names
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  // Specify files to include in the project
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts"
+  ],
+  // Specify files to exclude from the project
   "exclude": ["node_modules"]
 }

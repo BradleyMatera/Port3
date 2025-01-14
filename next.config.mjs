@@ -1,14 +1,19 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   eslint: {
-    ignoreDuringBuilds: true,
+    ignoreDuringBuilds: true, 
   },
   typescript: {
     ignoreBuildErrors: true,
   },
   images: {
-    unoptimized: true,
+    domains: ['image-cdn-fa.spotifycdn.com', 'localhost', 'mosaic.scdn.co', 'i.scdn.co'], // Add your allowed image domains here
   },
+  experimental: {
+    appDir: true,
+  },
+  reactStrictMode: true,
+  trailingSlash: false,
 };
 
 export default nextConfig;

@@ -1,37 +1,42 @@
+# Docs
+
 ```mermaid
 graph TD
 A[Project Root] --> B[./app]
 A --> C[./components]
 A --> D[./hooks]
 A --> E[./lib]
-A --> F[./server]
-A --> G[./utils]
-A --> H[./styles]
-A --> I[./public]
-A --> J[./Designs]
-A --> K[./config]
-A --> L[Other Root Files]
+A --> F[./utils]
+A --> G[./styles]
+A --> H[./public]
+A --> I[./Designs]
+A --> J[./config]
+A --> K[Other Root Files]
 
 %% App folder
-B --> B1[./app/api/auth/callback/route.ts]
-B1 --> B1A["import { NextResponse } from 'next/server';"]
-B1 --> B1B["import { generateRandomString } from '../../../../utils';"]
+B --> B1["./app/api/auth/[...nextauth]/route.ts"]
+B1 --> B1A["import NextAuth from 'next-auth';"]
+B1 --> B1B["import SpotifyProvider from 'next-auth/providers/spotify';"]
 
-B --> B2[./app/api/auth/spotify/route.ts]
-B2 --> B2A["import { NextResponse } from 'next/server';"]
-B2 --> B2B["import { cookies } from 'next/headers';"]
+B --> B2[./app/layout.tsx]
+B2 --> B2A["import './globals.css';"]
+B2 --> B2B["import { BottomNav } from '@/components/layout/bottom-nav';"]
 
-B --> B3[./app/layout.tsx]
-B3 --> B3A["import './globals.css';"]
-B3 --> B3B["import { BottomNav } from '@/components/layout/bottom-nav';"]
+B --> B3[./app/profile/page.tsx]
+B3 --> B3A["import { useSession } from 'next-auth/react';"]
+B3 --> B3B["import ProfileClient from './profile-client';"]
 
 B --> B4[./app/music-search/page.tsx]
-B4 --> B4A["import { useState, useEffect } from 'react';"]
+B4 --> B4A["import { useSession, signIn } from 'next-auth/react';"]
 B4 --> B4B["import { Button } from '@/components/ui/button';"]
 
-B --> B5[./app/profile/profile-client.tsx]
-B5 --> B5A["import { ChevronRight } from 'lucide-react';"]
-B5 --> B5B["import Image from 'next/image';"]
+B --> B5[./app/audio-books/page.tsx]
+B5 --> B5A["import { useSession } from 'next-auth/react';"]
+B5 --> B5B["import { ScrollArea } from '@/components/ui/scroll-area';"]
+
+B --> B6[./app/player/page.tsx]
+B6 --> B6A["import { useEffect, useState } from 'react';"]
+B6 --> B6B["import { Card } from '@/components/ui/card';"]
 
 %% Components folder
 C --> C1[./components/ui/button.tsx]
@@ -41,71 +46,90 @@ C --> C2[./components/layout/bottom-nav.tsx]
 C2 --> C2A["import Link from 'next/link';"]
 C2 --> C2B["import { useRouter } from 'next/navigation';"]
 
+C --> C3[./components/ui/dropdown.tsx]
+C3 --> C3A["Creates dropdown menu for playlist selection"]
+
 %% Hooks folder
 D --> D1[./hooks/useSpotifyAuth.ts]
-D1 --> D1A["import { useEffect, useState } from 'react';"]
+D1 --> D1A["Handles Spotify token retrieval and management"]
 
 D --> D2[./hooks/use-toast.ts]
-D2 --> D2A["import { useToast } from 'some-toast-library';"]
+D2 --> D2A["Toast notifications for user feedback"]
 
 %% Lib folder
 E --> E1[./lib/utils.ts]
-E1 --> E1A["export async function fetchData(url: string) {...};"]
-
-%% Server folder
-F --> F1[./server/controllers/authentication_controller.js]
-F1 --> F1A["import { generateToken } from '../utils/token';"]
-
-F --> F2[./server/routes/auth.js]
-F2 --> F2A["import { Router } from 'express';"]
-F2 --> F2B["import { login, logout } from '../controllers/authentication_controller';"]
+E1 --> E1A["Utility functions for API calls and formatting"]
 
 %% Utils folder
-G --> G1[./utils/index.ts]
-G1 --> G1A["export function generateRandomString(length: number): string {...};"]
+F --> F1[./utils/index.ts]
+F1 --> F1A["Reusable helper functions for various tasks"]
 
 %% Styles folder
-H --> H1[./styles/globals.css]
+G --> G1[./styles/globals.css]
+G1 --> G1A["Contains TailwindCSS styles and global customizations"]
 
 %% Public folder
-I --> I1[./public/placeholder.jpg]
-I --> I2[./public/spotify-logo.svg]
+H --> H1[./public/placeholder.jpg]
+H --> H2[./public/spotify-logo.svg]
 
 %% Config files
-L --> L1[./next.config.mjs]
-L1 --> L1A["module.exports = {...};"]
+J --> J1[./next.config.mjs]
+J1 --> J1A["Enables React Strict Mode and custom domains for images"]
 
-L --> L2[./tailwind.config.ts]
-L2 --> L2A["module.exports = {...};"]
+J --> J2[./tailwind.config.ts]
+J2 --> J2A["Customizes TailwindCSS theme and plugins"]
 
 %% README and Designs
-L --> M1[./README.md]
-J --> J1[./Designs/Home.png]
+K --> K1[./README.md]
+I --> I1[./Designs/Profile.png]
 ```
 
-# Project Structure Documentation
+## Project Structure Documentation
 
-## File Organization Overview
+### File Organization Overview
 
 1. **Main Files in the Project**
-   * The top-level node represents all the primary files and directories in your project, like app, components, server, and lib. Each file is shown as a node, with arrows pointing to other files it depends on.
+   * The project root contains primary directories such as `app`, `components`, `hooks`, `lib`, `server`, and `utils`, each housing critical application logic. Each file within these directories interacts with others to build the full functionality of the application.
 
 2. **App Directory**
-   * This is the main entry point for your Next.js application. For instance:
-   * app/music-search/page.tsx depends on React imports like useState and useEffect, and components like Button from the UI folder.
-   * app/profile/profile-client.tsx uses external libraries like lucide-react and next/image to render user data.
+   * This directory is the entry point of the Next.js application. It structures the routing system and contains dynamic and static pages.
+   * `app/music-search/page.tsx`: Handles music search functionality using React hooks like `useState` and `useEffect`. It incorporates UI elements like buttons from the `ui` folder for a seamless user interface.
+   * `app/profile/profile-client.tsx`: Renders user data by leveraging libraries such as `lucide-react` for icons and `next/image` for optimized images. It manages authenticated user data retrieved via `next-auth`.
 
 3. **Component Dependencies**
-   * Components like bottom-nav.tsx are imported across multiple files (e.g., in app/profile/page.tsx and app/layout.tsx). This shows shared UI elements, such as the bottom navigation bar, being reused throughout the project.
+   * Shared components ensure consistency and reusability across the application.
+   * `components/layout/bottom-nav.tsx`: Implements a reusable bottom navigation bar, imported by `layout.tsx` and various pages to provide consistent navigation.
+   * `components/ui/button.tsx`: Defines a customizable button component used throughout the app for consistent styling and behavior.
 
-4. **Backend Connections**
-   * In the server folder, files like authentication_controller.js interact with routes/auth.js to manage authentication logic. These are tightly coupled with environment variables (SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET) defined in .env.
+4. **Authentication and Backend Connections**
+   * Authentication logic and backend integrations are handled efficiently.
+   * `app/api/auth/[...nextauth]/route.ts`: Configures `NextAuth` with providers like Spotify to manage user authentication securely.
+   * `server/controllers/authentication_controller.js` and `server/routes/auth.js`: Handle backend logic for login and logout, tightly integrated with the frontend.
 
 5. **Utility Files**
-   * Shared logic, like generating random strings or utility functions, is stored in the utils folder. These utilities are imported wherever needed, ensuring code reusability.
+   * The `utils` folder centralizes reusable logic.
+   * `utils/index.ts`: Contains helper functions like `generateRandomString`, used for secure token generation and API query construction.
+   * Utility functions ensure consistency and reduce redundancy across different parts of the codebase.
 
 6. **Public Assets**
-   * Static files (e.g., images and logos in the public folder) are referenced by UI components and rendered directly in the app.
+   * The `public` folder stores static assets.
+   * Includes images and SVGs used across the app, like the Spotify logo and placeholder images.
+   * Public assets are directly referenced in UI components for optimized rendering.
 
-7. **Frontend and Backend Interactions**
-   * The app/api/auth/spotify/route.ts file connects the frontend to Spotify's API for authentication. It ensures the app and backend communicate seamlessly.
+7. **Styling and Themes**
+   * The `styles` folder holds global and component-specific styles.
+   * `styles/globals.css`: Centralizes TailwindCSS configurations and custom themes, ensuring a cohesive design system.
+
+8. **Frontend and Backend Interactions**
+   * Seamless communication between the frontend and backend is achieved through API routes.
+   * `app/api/auth/spotify/route.ts`: Facilitates frontend interaction with Spotify’s API, handling token exchanges and user data retrieval.
+   * These routes ensure secure and efficient data flow, leveraging Next.js serverless functions.
+
+9. **Hook Implementations**
+   * Custom hooks enhance functionality.
+   * `hooks/useSpotifyAuth.ts`: Manages Spotify token retrieval and refresh logic, ensuring persistent authentication.
+   * `hooks/use-toast.ts`: Provides a toast notification system for user feedback across different components.
+
+10. **Designs and Documentation**
+    * The `Designs` folder includes visual references for the app’s layout, aiding in consistency during development.
+    * Documentation files, like `README.md`, provide developers with guidelines and project structure explanations.

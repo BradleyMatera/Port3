@@ -2,67 +2,167 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Define custom classes in the utilities layer */
+@layer utilities {
+
+  /* Custom text colors */
+  .text-heading-color {
+    @apply text-gray-900;
+    /* Default fallback if `--heading-color` is not applied */
+    color: var(--heading-color);
+    /* Uses your custom CSS variable */
+  }
+
+  .text-body-color {
+    @apply text-gray-700;
+    /* Default fallback if `--body-color` is not applied */
+    color: var(--body-color);
+    /* Uses your custom CSS variable */
+  }
+
+  .text-link-color {
+    @apply text-blue-500;
+    /* Default fallback if `--link-color` is not applied */
+    color: var(--link-color);
+  }
+
+  .hover\\:text-link-color:hover {
+    color: var(--link-color-hover, hsl(210, 90%, 65%));
+    /* Default hover color */
+  }
+}
+
 @layer base {
   :root {
+    /* General Colors */
     --background: 0 0% 100%;
     --foreground: 0 0% 3.9%;
 
+    /* Card */
     --card: 0 0% 100%;
     --card-foreground: 0 0% 3.9%;
 
+    /* Popover */
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 3.9%;
 
+    /* Primary Colors */
     --primary: 0 84% 60%;
     --primary-foreground: 0 85.7% 97.3%;
 
+    /* Secondary Colors */
     --secondary: 0 0% 96.1%;
     --secondary-foreground: 0 0% 9%;
 
+    /* Muted Colors */
     --muted: 0 0% 96.1%;
     --muted-foreground: 0 0% 45.1%;
 
+    /* Accent Colors */
     --accent: 0 0% 96.1%;
     --accent-foreground: 0 0% 9%;
 
+    /* Destructive Colors */
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
 
+    /* Additional Colors */
+    --info: 210 78% 56%;
+    --success: 120 57% 40%;
+    --warning: 39 100% 57%;
+    --error: 0 84% 60%;
+
+    /* Borders & Rings */
     --border: 0 0% 89.8%;
     --input: 0 0% 89.8%;
     --ring: 0 0% 3.9%;
 
+    /* Typography */
+    --font-sans: 'Inter', sans-serif;
+    --font-serif: 'Georgia', serif;
+    --font-mono: 'Courier New', monospace;
+
+    --heading-color: 0 0% 3.9%;
+    --body-color: 0 0% 25%;
+    --link-color: 210 78% 56%;
+
+    /* Spacing */
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 2rem;
+    --spacing-xl: 4rem;
+
+    /* Shadows */
+    --shadow-xs: 0 1px 2px 0 hsla(0, 0%, 0%, 0.05);
+    --shadow-sm: 0 1px 3px 0 hsla(0, 0%, 0%, 0.1);
+    --shadow-md: 0 4px 6px -1px hsla(0, 0%, 0%, 0.1);
+    --shadow-lg: 0 10px 15px -3px hsla(0, 0%, 0%, 0.1);
+    --shadow-xl: 0 20px 25px -5px hsla(0, 0%, 0%, 0.1);
+
+    /* Radius */
     --radius: 0.5rem;
+    --radius-sm: 0.25rem;
+    --radius-lg: 1rem;
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(90deg, hsl(0, 84%, 60%) 0%, hsl(0, 85.7%, 97.3%) 100%);
+    --gradient-secondary: linear-gradient(90deg, hsl(0, 0%, 96.1%) 0%, hsl(0, 0%, 9%) 100%);
   }
 
   .dark {
+    /* General Colors */
     --background: 0 0% 3.9%;
     --foreground: 0 0% 98%;
 
+    /* Card */
     --card: 0 0% 3.9%;
     --card-foreground: 0 0% 98%;
 
+    /* Popover */
     --popover: 0 0% 3.9%;
     --popover-foreground: 0 0% 98%;
 
+    /* Primary Colors */
     --primary: 0 84% 60%;
     --primary-foreground: 0 85.7% 97.3%;
 
+    /* Secondary Colors */
     --secondary: 0 0% 14.9%;
     --secondary-foreground: 0 0% 98%;
 
+    /* Muted Colors */
     --muted: 0 0% 14.9%;
     --muted-foreground: 0 0% 63.9%;
 
+    /* Accent Colors */
     --accent: 0 0% 14.9%;
     --accent-foreground: 0 0% 98%;
 
+    /* Destructive Colors */
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
 
+    /* Borders & Rings */
     --border: 0 0% 14.9%;
     --input: 0 0% 14.9%;
     --ring: 0 0% 83.1%;
+
+    /* Typography */
+    --heading-color: 0 0% 98%;
+    --body-color: 0 0% 75%;
+    --link-color: 210 90% 70%;
+
+    /* Shadows */
+    --shadow-xs: 0 1px 2px 0 hsla(0, 0%, 98%, 0.05);
+    --shadow-sm: 0 1px 3px 0 hsla(0, 0%, 98%, 0.1);
+    --shadow-md: 0 4px 6px -1px hsla(0, 0%, 98%, 0.1);
+    --shadow-lg: 0 10px 15px -3px hsla(0, 0%, 98%, 0.1);
+    --shadow-xl: 0 20px 25px -5px hsla(0, 0%, 98%, 0.1);
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(90deg, hsl(0, 84%, 40%) 0%, hsl(0, 85.7%, 80%) 100%);
+    --gradient-secondary: linear-gradient(90deg, hsl(0, 0%, 20%) 0%, hsl(0, 0%, 70%) 100%);
   }
 }
 
@@ -70,8 +170,26 @@
   * {
     @apply border-border;
   }
+
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply text-heading-color font-bold;
+  }
+
+  p {
+    @apply text-body-color;
+  }
+
+  a {
+    @apply text-link-color hover:underline;
   }
 }
 

@@ -1,11 +1,15 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 
 export default function SpotifyPlayerPage() {
   const [accessToken, setAccessToken] = useState<string | null>(null);
-  const [playlistUri, setPlaylistUri] = useState<string | null>(null);
+  const [playlists, setPlaylists] = useState<{ id: string; name: string; uri: string }[]>([]);
+  const [selectedPlaylistUri, setSelectedPlaylistUri] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -28,6 +32,7 @@ export default function SpotifyPlayerPage() {
     if (!accessToken) return;
 
     const fetchUserPlaylists = async () => {
+      setLoading(true);
       try {
         const response = await fetch('https://api.spotify.com/v1/me/playlists', {
           headers: { Authorization: `Bearer ${accessToken}` },
@@ -44,7 +49,12 @@ export default function SpotifyPlayerPage() {
         } else {
           const data = await response.json();
           if (data?.items?.length > 0) {
-            setPlaylistUri(data.items[0].uri);
+            const playlistData = data.items.map((item: any) => ({
+              id: item.id,
+              name: item.name,
+              uri: item.uri,
+            }));
+            setPlaylists(playlistData);
           } else {
             setError('No playlists found.');
           }
@@ -52,6 +62,8 @@ export default function SpotifyPlayerPage() {
       } catch (err) {
         console.error('Error fetching playlists:', err);
         setError('An error occurred while fetching playlists.');
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -59,22 +71,75 @@ export default function SpotifyPlayerPage() {
   }, [accessToken]);
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-6">
-      <h1 className="text-3xl font-bold mb-4">Spotify Web Player</h1>
-      {error && <p className="text-red-500">{error}</p>}
-      {playlistUri ? (
-        <iframe
-          src={`https://open.spotify.com/embed/playlist/${playlistUri.split(':')[2]}`}
-          width="100%"
-          height="380"
-          frameBorder="0"
-          allow="encrypted-media"
-          allowFullScreen
-          className="rounded-lg"
-        ></iframe>
-      ) : (
-        !error && <p className="text-gray-400">Loading your playlist...</p>
-      )}
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-black to-gray-800 text-white p-8">
+      <Card className="p-6 bg-gradient-to-b from-zinc-800 to-zinc-700 shadow-md rounded-lg">
+        <h1 className="text-4xl font-bold text-primary mb-4 text-center">
+          Spotify Web Player
+        </h1>
+        {loading && (
+          <p className="text-lg text-center text-gray-400">Loading your playlists...</p>
+        )}
+        {error && (
+          <p className="text-center text-red-500 text-lg mb-4">{error}</p>
+        )}
+        {playlists.length > 0 && (
+          <div className="mb-6">
+            <h2 className="text-2xl font-semibold mb-4">Select a Playlist</h2>
+            <select
+              title="Select a playlist"
+              className="w-full p-3 rounded-lg bg-zinc-800 text-white focus:outline-none focus:ring-2 focus:ring-primary"
+              value={selectedPlaylistUri || ''}
+              onChange={(e) => setSelectedPlaylistUri(e.target.value)}
+            >
+              <option value="" disabled>
+                Choose a playlist
+              </option>
+              {playlists.map((playlist) => (
+                <option key={playlist.id} value={playlist.uri}>
+                  {playlist.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+        {selectedPlaylistUri ? (
+          <iframe
+            src={`https://open.spotify.com/embed/playlist/${selectedPlaylistUri.split(':')[2]}`}
+            width="100%"
+            height="380"
+            frameBorder="0"
+            allow="encrypted-media"
+            allowFullScreen
+            className="rounded-lg shadow-md"
+          ></iframe>
+        ) : (
+          !error &&
+          !loading && (
+            <p className="text-center text-gray-400 text-lg">
+              Select a playlist to start playing.
+            </p>
+          )
+        )}
+      </Card>
+
+      {/* Footer Buttons */}
+      <div className="mt-8 flex justify-center space-x-4">
+        <Button
+          variant="default"
+          onClick={() => (window.location.href = 'http://localhost:3001/login')}
+        >
+          Reload Player
+        </Button>
+        <Button
+          variant="destructive"
+          onClick={() => {
+            localStorage.removeItem('spotify_access_token');
+            window.location.href = 'http://localhost:3001/login';
+          }}
+        >
+          Log Out
+        </Button>
+      </div>
     </div>
   );
 }

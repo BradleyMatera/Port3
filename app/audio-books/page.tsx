@@ -2,24 +2,29 @@
 
 import { useState } from 'react';
 import { useSession, signIn } from 'next-auth/react';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 export default function AudiobooksSearchPage() {
   const { data: session } = useSession();
   const [query, setQuery] = useState('');
-  const [audiobooks, setAudiobooks] = useState<{ id: string; name: string; images: { url: string }[]; authors: { name: string }[]; narrators: { name: string }[] }[]>([]);
+  const [audiobooks, setAudiobooks] = useState<
+    { id: string; name: string; images: { url: string }[]; authors: { name: string }[]; narrators: { name: string }[] }[]
+  >([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   if (!session) {
     return (
-      <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center">
-        <h1 className="text-3xl font-bold mb-6">You are not signed in</h1>
-        <button
+      <div className="min-h-screen bg-gradient-to-b from-gray-900 via-black to-gray-800 text-white flex flex-col items-center justify-center">
+        <h1 className="text-4xl font-bold mb-8">Sign In to Search Audiobooks</h1>
+        <Button
           onClick={() => signIn('spotify')}
-          className="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg"
+          className="bg-green-500 hover:bg-green-600 text-white px-8 py-4 text-lg rounded-lg"
         >
           Sign in with Spotify
-        </button>
+        </Button>
       </div>
     );
   }
@@ -45,12 +50,7 @@ export default function AudiobooksSearchPage() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        if (response.status === 403) {
-          setError('Permission denied. Check your Spotify scopes.');
-        } else {
-          setError(`Failed to fetch audiobooks. Status: ${response.status}`);
-        }
-        console.error('Error fetching audiobooks:', response.status, errorData);
+        setError(`Failed to fetch audiobooks: ${errorData.error?.message || response.statusText}`);
         return;
       }
 
@@ -65,51 +65,60 @@ export default function AudiobooksSearchPage() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white p-6">
-      <h1 className="text-3xl font-semibold mb-6">Search Audiobooks</h1>
+    <ScrollArea className="min-h-screen bg-gradient-to-b from-gray-900 via-black to-gray-800 text-white p-8 space-y-8">
+      {/* Header */}
+      <div className="text-center">
+        <h1 className="text-4xl font-bold text-primary mb-4">Search Audiobooks</h1>
+        <p className="text-lg text-muted">
+          Discover your next favorite audiobook from Spotify’s extensive collection!
+        </p>
+      </div>
 
-      <div className="mb-4">
+      {/* Search Bar */}
+      <div className="flex flex-col items-center space-y-4 mb-8">
         <input
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search for audiobooks..."
-          className="w-full p-3 text-black rounded"
+          className="w-full max-w-lg p-4 bg-zinc-800 text-white placeholder-zinc-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
         />
-        <button
+        <Button
+          className="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg text-lg"
           onClick={handleSearch}
-          className="mt-2 w-full bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600"
         >
           Search
-        </button>
+        </Button>
       </div>
 
-      {loading && <div>Loading audiobooks...</div>}
-      {error && <div className="text-red-500">{error}</div>}
+      {/* Loading and Error States */}
+      {loading && <p className="text-center text-white text-lg">Loading audiobooks...</p>}
+      {error && <p className="text-center text-red-500 text-lg">{error}</p>}
 
-      <ul>
-        {audiobooks.map((audiobook) => (
-          <li key={audiobook.id} className="mb-6">
-            <div className="flex items-center space-x-4">
+      {/* Results Section */}
+      {audiobooks.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {audiobooks.map((audiobook) => (
+            <Card
+              key={audiobook.id}
+              className="p-6 bg-gradient-to-b from-zinc-800 via-zinc-700 to-black rounded-lg shadow-md hover:shadow-lg hover:scale-105 transition-transform"
+            >
               <img
-                src={audiobook.images[0]?.url || '/placeholder-audiobook.jpg'}
+                src={audiobook.images[0]?.url || '/images/placeholder-audiobook.jpg'}
                 alt={audiobook.name}
-                className="w-20 h-20 object-cover rounded"
+                className="w-full h-40 object-cover rounded-lg mb-4"
               />
-              <div>
-                <p className="text-xl font-medium">{audiobook.name}</p>
-                <p className="text-sm text-gray-400">
-                  By {audiobook.authors?.map((author) => author.name).join(', ')}
-                </p>
-                <p className="text-sm text-gray-400">
-                  Narrated by{' '}
-                  {audiobook.narrators?.map((narrator) => narrator.name).join(', ')}
-                </p>
-              </div>
-            </div>
-          </li>
-        ))}
-      </ul>
-    </div>
+              <h3 className="text-xl font-semibold text-white">{audiobook.name}</h3>
+              <p className="text-zinc-400 text-sm">
+                By {audiobook.authors?.map((author) => author.name).join(', ')}
+              </p>
+              <p className="text-zinc-400 text-sm">
+                Narrated by {audiobook.narrators?.map((narrator) => narrator.name).join(', ')}
+              </p>
+            </Card>
+          ))}
+        </div>
+      )}
+    </ScrollArea>
   );
 }

@@ -2,17 +2,17 @@
 
 import { useState } from 'react';
 import { useSession, signIn } from 'next-auth/react';
-import { Session } from 'next-auth';
-
-declare module 'next-auth' {
-  interface Session {
-    accessToken?: string;
-  }
-}
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 export default function ShowSearchPage() {
   const { data: session } = useSession();
   const [query, setQuery] = useState('');
+  const [shows, setShows] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
   interface Show {
     id: string;
     name: string;
@@ -21,20 +21,16 @@ export default function ShowSearchPage() {
     images: { url: string }[];
   }
 
-  const [shows, setShows] = useState<Show[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
   if (!session) {
     return (
-      <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center">
-        <h1 className="text-3xl font-bold mb-6">You are not signed in</h1>
-        <button
+      <div className="min-h-screen bg-gradient-to-b from-gray-900 via-black to-gray-800 text-white flex flex-col items-center justify-center">
+        <h1 className="text-4xl font-bold mb-8">Sign In to Search Shows</h1>
+        <Button
           onClick={() => signIn('spotify')}
-          className="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg"
+          className="bg-green-500 hover:bg-green-600 text-white px-8 py-4 text-lg rounded-lg"
         >
           Sign in with Spotify
-        </button>
+        </Button>
       </div>
     );
   }
@@ -50,24 +46,17 @@ export default function ShowSearchPage() {
 
     try {
       const response = await fetch(
-        `https://api.spotify.com/v1/search?q=${encodeURIComponent(
-          query
-        )}&type=show&limit=10`,
+        `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=show&limit=10`,
         {
           headers: {
-            Authorization: `Bearer ${session.accessToken}`,
+            Authorization: `Bearer ${session?.user?.accessToken}`,
           },
         }
       );
 
       if (!response.ok) {
         const errorData = await response.json();
-        if (response.status === 403) {
-          setError('Permission denied. Check your Spotify scopes.');
-        } else {
-          setError(`Failed to fetch shows. Status: ${response.status}`);
-        }
-        console.error('Error fetching shows:', response.status, errorData);
+        setError(`Failed to fetch shows: ${errorData.error?.message || response.statusText}`);
         return;
       }
 
@@ -82,46 +71,54 @@ export default function ShowSearchPage() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white p-6">
-      <h1 className="text-3xl font-semibold mb-6">Search Shows</h1>
+    <ScrollArea className="min-h-screen bg-gradient-to-b from-gray-900 via-black to-gray-800 text-white p-8 space-y-8">
+      {/* Header */}
+      <div className="text-center">
+        <h1 className="text-4xl font-bold text-primary mb-4">Search Shows</h1>
+        <p className="text-lg text-muted">Find your favorite podcasts and shows from Spotify!</p>
+      </div>
 
-      <div className="mb-4">
+      {/* Search Bar */}
+      <div className="flex flex-col items-center space-y-4 mb-8">
         <input
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search for shows..."
-          className="w-full p-3 text-black rounded"
+          className="w-full max-w-lg p-4 text-black rounded-lg bg-zinc-800 text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-primary"
         />
-        <button
+        <Button
+          className="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg text-lg"
           onClick={handleSearch}
-          className="mt-2 w-full bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600"
         >
           Search
-        </button>
+        </Button>
       </div>
 
-      {loading && <div>Loading shows...</div>}
-      {error && <div className="text-red-500">{error}</div>}
+      {/* Loading and Error States */}
+      {loading && <p className="text-center text-white text-lg">Loading shows...</p>}
+      {error && <p className="text-center text-red-500 text-lg">{error}</p>}
 
-      <ul>
-        {shows.map((show) => (
-          <li key={show.id} className="mb-6">
-            <div className="flex items-center space-x-4">
-              <img
-                src={show.images[0]?.url || '/placeholder-show.jpg'}
-                alt={show.name}
-                className="w-20 h-20 object-cover rounded"
-              />
-              <div>
-                <p className="text-xl font-medium">{show.name}</p>
-                <p className="text-sm text-gray-400">{show.description}</p>
-                <p className="text-sm text-gray-400">Publisher: {show.publisher}</p>
-              </div>
-            </div>
-          </li>
-        ))}
-      </ul>
-    </div>
+      {/* Results Section */}
+      {shows.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {shows.map((show: Show) => (
+            <Card
+              key={show.id}
+              className="p-6 bg-gradient-to-b from-zinc-800 via-zinc-700 to-black rounded-lg shadow-md hover:shadow-lg hover:scale-105 transition-transform"
+            >
+                <img
+                  src={show.images?.[0]?.url || '/images/placeholder-show.jpg'}
+                  alt={show.name}
+                  className="w-full h-40 object-cover rounded-lg mb-4"
+                />
+              <h3 className="text-xl font-semibold text-white">{show.name}</h3>
+              <p className="text-zinc-400 text-sm">{show.description}</p>
+              <p className="text-zinc-400 text-sm">Publisher: {show.publisher}</p>
+            </Card>
+          ))}
+        </div>
+      )}
+    </ScrollArea>
   );
 }

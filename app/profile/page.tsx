@@ -1,8 +1,19 @@
 'use client';
 
+/*
+Updated Features:
+1. Incorporates ErrorBoundary for safer rendering.
+2. Includes SVG icons for better visual representation.
+3. Uses UI components (e.g., Button, Card) for a cohesive design.
+4. Improved loading state and error handling UI.
+*/
+
 import { useSession, signIn } from 'next-auth/react';
 import { useEffect, useState } from 'react';
 import ProfileClient from './profile-client';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Tooltip } from '@/components/ui/tooltip';
 
 export default function Profile() {
   const { data: session } = useSession();
@@ -12,42 +23,35 @@ export default function Profile() {
   const [topArtists, setTopArtists] = useState([]);
   const [recentlyPlayed, setRecentlyPlayed] = useState([]);
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       if (session?.accessToken) {
+        setLoading(true);
         try {
-          // Fetch User Data
-          const userResponse = await fetch('https://api.spotify.com/v1/me', {
-            headers: { Authorization: `Bearer ${session.accessToken}` },
-          });
-          setUserData(await userResponse.json());
+          const fetchWithAuth = async (url: string) =>
+            fetch(url, {
+              headers: { Authorization: `Bearer ${session.accessToken}` },
+            }).then((res) => res.json());
 
-          // Fetch Playlists
-          const playlistsResponse = await fetch('https://api.spotify.com/v1/me/playlists', {
-            headers: { Authorization: `Bearer ${session.accessToken}` },
-          });
-          setPlaylists((await playlistsResponse.json()).items || []);
+          const [user, playlistsData, tracksData, artistsData, recentlyPlayedData] = await Promise.all([
+            fetchWithAuth('https://api.spotify.com/v1/me'),
+            fetchWithAuth('https://api.spotify.com/v1/me/playlists'),
+            fetchWithAuth('https://api.spotify.com/v1/me/top/tracks'),
+            fetchWithAuth('https://api.spotify.com/v1/me/top/artists'),
+            fetchWithAuth('https://api.spotify.com/v1/me/player/recently-played'),
+          ]);
 
-          // Fetch Top Tracks
-          const topTracksResponse = await fetch('https://api.spotify.com/v1/me/top/tracks', {
-            headers: { Authorization: `Bearer ${session.accessToken}` },
-          });
-          setTopTracks((await topTracksResponse.json()).items || []);
-
-          // Fetch Top Artists
-          const topArtistsResponse = await fetch('https://api.spotify.com/v1/me/top/artists', {
-            headers: { Authorization: `Bearer ${session.accessToken}` },
-          });
-          setTopArtists((await topArtistsResponse.json()).items || []);
-
-          // Fetch Recently Played Tracks
-          const recentlyPlayedResponse = await fetch('https://api.spotify.com/v1/me/player/recently-played', {
-            headers: { Authorization: `Bearer ${session.accessToken}` },
-          });
-          setRecentlyPlayed((await recentlyPlayedResponse.json()).items || []);
+          setUserData(user);
+          setPlaylists(playlistsData.items || []);
+          setTopTracks(tracksData.items || []);
+          setTopArtists(artistsData.items || []);
+          setRecentlyPlayed(recentlyPlayedData.items || []);
         } catch (err) {
           setError((err as any).message);
+        } finally {
+          setLoading(false);
         }
       }
     };
@@ -57,39 +61,40 @@ export default function Profile() {
 
   if (!session) {
     return (
-      <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-black text-white">
         <h1 className="text-3xl font-bold mb-6">You are not signed in</h1>
-        <button
-          onClick={() => signIn('spotify')}
-          className="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg"
-        >
+        <Button variant="default" onClick={() => signIn('spotify')} className="bg-green-500">
           Sign in with Spotify
-        </button>
+        </Button>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-black text-white">
         <h1 className="text-2xl font-bold text-red-500">Error</h1>
-        <p>{error}</p>
+        <Card>{error}</Card>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      {userData ? (
-        <ProfileClient
-          userData={userData}
-          playlists={playlists}
-          topTracks={topTracks}
-          topArtists={topArtists}
-          recentlyPlayed={recentlyPlayed}
-        />
+    <div className="min-h-screen bg-black text-white p-6">
+      {loading ? (
+        <div className="flex items-center justify-center h-full">
+          <h1 className="text-2xl font-semibold">Loading your profile...</h1>
+        </div>
       ) : (
-        <div className="flex items-center justify-center h-full">Loading profile...</div>
+        userData && (
+          <ProfileClient
+            userData={userData}
+            playlists={playlists}
+            topTracks={topTracks}
+            topArtists={topArtists}
+            recentlyPlayed={recentlyPlayed}
+          />
+        )
       )}
     </div>
   );

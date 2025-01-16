@@ -174,31 +174,31 @@ Process Overview
 	2.	NextAuth Sends Authentication Request
 	•	The app utilizes NextAuth’s /api/auth/signin/spotify endpoint, which handles OAuth logic with Spotify.
 	3.	API Communicates with Spotify
-	•	NextAuth sends an authorization request to Spotify’s OAuth URL. This includes:
-	•	Client ID
-	•	Redirect URI (configured in Spotify Developer Dashboard)
+	•	NextAuth sends an authorization request to Spotify’s OAuth URL. This request includes:
+	•	Client ID (from the environment variables or .env file)
+	•	Redirect URI (configured in the Spotify Developer Dashboard)
 	•	Scopes (e.g., user-read-email, user-read-private, user-top-read)
 	•	A randomly generated state to protect against CSRF attacks.
 	4.	Spotify Prompts the User
-	•	Spotify displays an authorization screen, asking the user to approve access to their data.
+	•	Spotify displays an authorization screen asking the user to approve access to their data.
 	5.	User Approves Access
-	•	The user grants the requested permissions.
+	•	The user grants the requested permissions by approving Spotify’s access prompt.
 	6.	Spotify Sends an Authorization Code
 	•	Spotify redirects the user back to the callback URL configured in NextAuth, appending an authorization code.
 	7.	NextAuth Exchanges Code for Token
-	•	NextAuth sends the authorization code to Spotify’s token endpoint, retrieving:
-	•	An access token (to make authenticated API requests)
+	•	NextAuth sends the authorization code to Spotify’s token endpoint to retrieve:
+	•	An access token (for authenticated API requests)
 	•	A refresh token (to renew access when the token expires)
-	•	A token expiration time.
+	•	The token’s expiration time.
 	8.	Access Token is Stored in the Session
-	•	NextAuth securely stores the access token within the user session, enabling persistent authentication.
+	•	NextAuth securely stores the access token within the user session, enabling persistent authentication for the app.
 	9.	Authenticated API Requests
 	•	The app uses the access token from the session to query Spotify’s API for:
 	•	User profile data
 	•	Playlists
 	•	Top tracks and artists
 	10.	Automatic Token Refresh
-	•	NextAuth automatically refreshes the access token using the refresh token, ensuring seamless user experience without interruptions.
+	•	NextAuth automatically refreshes the access token using the refresh token, ensuring a seamless user experience without interruptions.
 
 🔄 API Integration
 
@@ -220,7 +220,66 @@ Endpoint	Method	Description
 	•	Dynamic Search: Search and explore music, albums, and playlists via Spotify’s API.
 	•	Audiobook Integration: Discover and search Spotify’s audiobook catalog.
 
-This flow is securely managed using NextAuth as the primary authentication solution, reducing boilerplate and improving the maintainability of the app.
+This flow is securely managed using NextAuth as the primary authentication solution, minimizing boilerplate and enhancing the app’s maintainability.•	The user clicks the “Login with Spotify” button on the app’s interface. This action triggers the authentication process via NextAuth.
+
+	2.	NextAuth Sends Authentication Request
+	•	The app utilizes NextAuth’s /api/auth/signin/spotify endpoint, which handles OAuth logic with Spotify.
+
+	3.	API Communicates with Spotify
+	•	NextAuth sends an authorization request to Spotify’s OAuth URL. This request includes:
+	•	Client ID (from the environment variables or .env file)
+	•	Redirect URI (configured in the Spotify Developer Dashboard)
+	•	Scopes (e.g., user-read-email, user-read-private, user-top-read)
+	•	A randomly generated state to protect against CSRF attacks.
+
+	4.	Spotify Prompts the User
+	•	Spotify displays an authorization screen asking the user to approve access to their data.
+
+	5.	User Approves Access
+	•	The user grants the requested permissions by approving Spotify’s access prompt.
+
+	6.	Spotify Sends an Authorization Code
+	•	Spotify redirects the user back to the callback URL configured in NextAuth, appending an authorization code.
+
+	7.	NextAuth Exchanges Code for Token
+	•	NextAuth sends the authorization code to Spotify’s token endpoint to retrieve:
+	•	An access token (for authenticated API requests)
+	•	A refresh token (to renew access when the token expires)
+	•	The token’s expiration time.
+
+	8.	Access Token is Stored in the Session
+	•	NextAuth securely stores the access token within the user session, enabling persistent authentication for the app.
+
+	9.	Authenticated API Requests
+	•	The app uses the access token from the session to query Spotify’s API for:
+	•	User profile data
+	•	Playlists
+	•	Top tracks and artists
+  
+	10.	Automatic Token Refresh
+	•	NextAuth automatically refreshes the access token using the refresh token, ensuring a seamless user experience without interruptions.
+
+🔄 API Integration
+
+<details>
+<summary>Available Endpoints</summary>
+
+
+Endpoint	Method	Description
+/api/auth/signin	POST	Initiates the NextAuth Spotify login
+/api/auth/session	GET	Fetches the active user session
+/api/auth/signout	POST	Ends the user session
+/api/auth/callback/spotify	GET	Handles Spotify OAuth callbacks
+
+</details>
+
+
+🎵 Music Discovery Features
+	•	Top Tracks and Artists: Displays user’s top tracks and favorite artists.
+	•	Dynamic Search: Search and explore music, albums, and playlists via Spotify’s API.
+	•	Audiobook Integration: Discover and search Spotify’s audiobook catalog.
+
+This flow is securely managed using NextAuth as the primary authentication solution, minimizing boilerplate and enhancing the app’s maintainability.
 
 </div>
 

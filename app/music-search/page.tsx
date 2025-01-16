@@ -5,11 +5,21 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import Image from 'next/image';
+
+type Track = {
+  id: string;
+  name: string;
+  album: {
+    images: Array<{ url: string }>;
+  };
+  artists: Array<{ name: string }>;
+};
 
 export default function MusicSearch() {
   const { data: session } = useSession();
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [searchResults, setSearchResults] = useState<Track[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -101,14 +111,16 @@ export default function MusicSearch() {
               key={item.id}
               className="p-6 bg-gradient-to-b from-zinc-800 via-zinc-700 to-black rounded-lg shadow-md hover:shadow-lg hover:scale-105 transition-transform"
             >
-              <img
+              <Image
                 src={item.album?.images[0]?.url || '/images/placeholder.jpg'}
-                alt={item.name}
-                className="w-full h-48 object-cover rounded-lg mb-4"
+                alt={item.name || 'Unknown Track'}
+                width={300}
+                height={300}
+                priority
               />
               <h3 className="text-xl font-semibold text-white">{item.name || 'Unknown Track'}</h3>
               <p className="text-zinc-400 text-sm">
-                {item.artists?.map((artist: { name: string }) => artist.name).join(', ') || 'Unknown Artist'}
+                {item.artists.map((artist) => artist.name).join(', ') || 'Unknown Artists'}
               </p>
             </Card>
           ))}

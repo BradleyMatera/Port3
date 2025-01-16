@@ -1,19 +1,8 @@
 'use client';
 
-/*
-Updated Features:
-1. Incorporates ErrorBoundary for safer rendering.
-2. Includes SVG icons for better visual representation.
-3. Uses UI components (e.g., Button, Card) for a cohesive design.
-4. Improved loading state and error handling UI.
-*/
-
 import { useSession, signIn } from 'next-auth/react';
 import { useEffect, useState } from 'react';
 import ProfileClient from './profile-client';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Tooltip } from '@/components/ui/tooltip';
 
 export default function Profile() {
   const { data: session } = useSession();
@@ -22,17 +11,16 @@ export default function Profile() {
   const [topTracks, setTopTracks] = useState([]);
   const [topArtists, setTopArtists] = useState([]);
   const [recentlyPlayed, setRecentlyPlayed] = useState([]);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
-      if (session?.accessToken) {
-        setLoading(true);
+      if (session?.user?.accessToken) {
         try {
-          const fetchWithAuth = async (url: string) =>
+          const fetchWithAuth = (url: string) =>
             fetch(url, {
-              headers: { Authorization: `Bearer ${session.accessToken}` },
+              headers: { Authorization: `Bearer ${session.user.accessToken}` },
             }).then((res) => res.json());
 
           const [user, playlistsData, tracksData, artistsData, recentlyPlayedData] = await Promise.all([
@@ -48,8 +36,8 @@ export default function Profile() {
           setTopTracks(tracksData.items || []);
           setTopArtists(artistsData.items || []);
           setRecentlyPlayed(recentlyPlayedData.items || []);
-        } catch (err) {
-          setError((err as any).message);
+        } catch {
+          setError('Failed to load data');
         } finally {
           setLoading(false);
         }
@@ -63,38 +51,32 @@ export default function Profile() {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-black text-white">
         <h1 className="text-3xl font-bold mb-6">You are not signed in</h1>
-        <Button variant="default" onClick={() => signIn('spotify')} className="bg-green-500">
+        <button
+          onClick={() => signIn('spotify')}
+          className="bg-green-500 px-6 py-3 rounded-lg text-white"
+        >
           Sign in with Spotify
-        </Button>
+        </button>
       </div>
     );
   }
 
   if (error) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-black text-white">
-        <h1 className="text-2xl font-bold text-red-500">Error</h1>
-        <Card>{error}</Card>
-      </div>
-    );
+    return <p className="text-center text-red-500">{error}</p>;
   }
 
   return (
     <div className="min-h-screen bg-black text-white p-6">
       {loading ? (
-        <div className="flex items-center justify-center h-full">
-          <h1 className="text-2xl font-semibold">Loading your profile...</h1>
-        </div>
+        <p>Loading...</p>
       ) : (
-        userData && (
-          <ProfileClient
-            userData={userData}
-            playlists={playlists}
-            topTracks={topTracks}
-            topArtists={topArtists}
-            recentlyPlayed={recentlyPlayed}
-          />
-        )
+        <ProfileClient
+          userData={userData}
+          playlists={playlists}
+          topTracks={topTracks}
+          topArtists={topArtists}
+          recentlyPlayed={recentlyPlayed}
+        />
       )}
     </div>
   );

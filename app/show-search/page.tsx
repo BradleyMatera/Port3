@@ -5,11 +5,12 @@ import { useSession, signIn } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import Image from 'next/image';
 
 export default function ShowSearchPage() {
   const { data: session } = useSession();
   const [query, setQuery] = useState('');
-  const [shows, setShows] = useState([]);
+  const [shows, setShows] = useState<Show[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -49,7 +50,7 @@ export default function ShowSearchPage() {
         `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=show&limit=10`,
         {
           headers: {
-            Authorization: `Bearer ${session?.user?.accessToken}`,
+            Authorization: `Bearer ${(session.user as { accessToken: string }).accessToken}`,
           },
         }
       );
@@ -85,7 +86,7 @@ export default function ShowSearchPage() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search for shows..."
-          className="w-full max-w-lg p-4 text-black rounded-lg bg-zinc-800 text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-primary"
+          className="w-full max-w-lg p-4 rounded-lg bg-zinc-800 text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-primary"
         />
         <Button
           className="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg text-lg"
@@ -102,19 +103,21 @@ export default function ShowSearchPage() {
       {/* Results Section */}
       {shows.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {shows.map((show: Show) => (
+          {shows.map((show) => (
             <Card
               key={show.id}
               className="p-6 bg-gradient-to-b from-zinc-800 via-zinc-700 to-black rounded-lg shadow-md hover:shadow-lg hover:scale-105 transition-transform"
             >
-                <img
-                  src={show.images?.[0]?.url || '/images/placeholder-show.jpg'}
-                  alt={show.name}
-                  className="w-full h-40 object-cover rounded-lg mb-4"
-                />
+              <Image
+                src={show.images?.[0]?.url || '/images/placeholder-show.jpg'}
+                alt={show.name}
+                width={320}
+                height={160}
+                className="w-full h-40 object-cover rounded-lg mb-4"
+              />
               <h3 className="text-xl font-semibold text-white">{show.name}</h3>
-              <p className="text-zinc-400 text-sm">{show.description}</p>
-              <p className="text-zinc-400 text-sm">Publisher: {show.publisher}</p>
+              <p className="text-zinc-400 text-sm">{show.description || 'No description available.'}</p>
+              <p className="text-zinc-400 text-sm">Publisher: {show.publisher || 'Unknown'}</p>
             </Card>
           ))}
         </div>

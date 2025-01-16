@@ -5,6 +5,8 @@ import { useSession, signIn } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import Image from 'next/image';
+
 
 export default function AudiobooksSearchPage() {
   const { data: session } = useSession();
@@ -103,11 +105,13 @@ export default function AudiobooksSearchPage() {
               key={audiobook.id}
               className="p-6 bg-gradient-to-b from-zinc-800 via-zinc-700 to-black rounded-lg shadow-md hover:shadow-lg hover:scale-105 transition-transform"
             >
-              <img
-                src={audiobook.images[0]?.url || '/images/placeholder-audiobook.jpg'}
-                alt={audiobook.name}
-                className="w-full h-40 object-cover rounded-lg mb-4"
-              />
+   <Image
+  src={audiobook.images[0]?.url || '/fallback-image.jpg'}
+  alt={audiobook.name || 'Fallback description'}
+  width={300}
+  height={300}
+  priority
+/>
               <h3 className="text-xl font-semibold text-white">{audiobook.name}</h3>
               <p className="text-zinc-400 text-sm">
                 By {audiobook.authors?.map((author) => author.name).join(', ')}

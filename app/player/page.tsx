@@ -4,9 +4,15 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 
+interface PlaylistItem {
+  id: string;
+  name: string;
+  uri: string;
+}
+
 export default function SpotifyPlayerPage() {
   const [accessToken, setAccessToken] = useState<string | null>(null);
-  const [playlists, setPlaylists] = useState<{ id: string; name: string; uri: string }[]>([]);
+  const [playlists, setPlaylists] = useState<PlaylistItem[]>([]);
   const [selectedPlaylistUri, setSelectedPlaylistUri] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -49,7 +55,7 @@ export default function SpotifyPlayerPage() {
         } else {
           const data = await response.json();
           if (data?.items?.length > 0) {
-            const playlistData = data.items.map((item: any) => ({
+            const playlistData = data.items.map((item: PlaylistItem) => ({
               id: item.id,
               name: item.name,
               uri: item.uri,
@@ -122,7 +128,6 @@ export default function SpotifyPlayerPage() {
         )}
       </Card>
 
-      {/* Footer Buttons */}
       <div className="mt-8 flex justify-center space-x-4">
         <Button
           variant="default"

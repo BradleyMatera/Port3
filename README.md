@@ -18,8 +18,6 @@ A modern, full-stack application that brings your Spotify profile to life with s
 
 ## ✨ Features
 
-## ✨ Features
-
 <table>
   <tr>
     <td>
@@ -57,89 +55,96 @@ A modern, full-stack application that brings your Spotify profile to life with s
   </tr>
 </table>
 
-## 🚀 Quick Start
-
-### Prerequisites
+## Prerequisites
 
 <details>
 <summary>Click to expand</summary>
 
-- Node.js 16+ ([Download](https://nodejs.org/))
-- npm 7+
-- MongoDB ([Install](https://www.mongodb.com/try/download/community))
-- Spotify Developer Account ([Dashboard](https://developer.spotify.com/dashboard/))
+
+	•	Node.js 16+ (Download)
+	•	npm 7+ (comes bundled with Node.js)
+	•	MongoDB Community Edition (Install)
+	•	Spotify Developer Account (Dashboard)
 
 </details>
 
-### Installation
 
-1️⃣ Clone the repository
-```bash
-git clone https://github.com/your-username/spotify-profile-viewer.git
-cd spotify-profile-viewer
-```
+Installation
 
-2️⃣ Install dependencies
-```bash
+1️⃣ Clone the repository:
+
+git clone https://github.com/BradleyMatera/Port3.git
+cd Port3
+
+2️⃣ Install dependencies:
+
 npm install
-```
 
-3️⃣ Configure environment variables
-```env
+3️⃣ Configure environment variables:
+Create a .env file in the root directory and add the following:
+
 SPOTIFY_CLIENT_ID=your_client_id
 SPOTIFY_CLIENT_SECRET=your_client_secret
-SPOTIFY_REDIRECT_URI=http://localhost:3001/auth/callback
-```
+SPOTIFY_REDIRECT_URI=http://localhost:3000/api/auth/callback
+NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_SECRET=your_secret_key
+PORT=3001
+MONGODB_URI=mongodb://localhost:27017/spotify-profile
 
-4️⃣ Start development servers
-```bash
-# Backend
-cd server && node server.js
+4️⃣ Start development servers:
 
-# Frontend (new terminal)
+# Frontend and backend (from project root)
 npm run dev
-```
 
-## 🛠️ Tech Stack
+🛠️ Tech Stack
 
 <details>
 <summary><b>Frontend</b></summary>
 
-- **Framework:** Next.js 15 with TypeScript 5
-- **UI Components:** 
-  - Radix UI primitives
-  - shadcn/ui components
-  - Tailwind CSS
-  - Lucide React icons
-- **State & Forms:** React Hook Form + Zod
-- **Data Visualization:** Recharts
-- **Theme:** Next-themes
-- **Utils:** date-fns, Embla Carousel
+
+	•	Framework: Next.js 15
+	•	UI Components:
+	•	TailwindCSS
+	•	Radix UI
+	•	shadcn/ui
+	•	Lucide React icons
+	•	State & Forms: React Hook Form + Zod for schema validation
+	•	Data Visualization: Recharts
+	•	Theme Management: Next-themes
+	•	Utilities: date-fns, Embla Carousel
 
 </details>
+
 
 <details>
 <summary><b>Backend</b></summary>
 
-- **Runtime:** Node.js with Express
-- **Database:** MongoDB + Mongoose
-- **Auth:** Custom OAuth implementation
-- **Networking:** Axios
-- **Logging:** Morgan
+
+	•	Runtime: Node.js with Express
+	•	Database: MongoDB using Mongoose
+	•	Authentication: NextAuth.js (Spotify Provider)
+	•	Networking: Axios for HTTP requests
+	•	Logging: Morgan for request logging
 
 </details>
+
 
 ## 📦 Project Structure
 
 ```
 spotify-profile-viewer/
+Port3/
 ├── app/                    # Next.js application
-│   ├── api/               # API routes
-│   ├── profile/          # Profile pages
-│   └── login/            # Authentication
-├── components/            # React components
-├── server/               # Backend server
-└── public/               # Static assets
+│   ├── api/               # API routes (NextAuth + custom endpoints)
+│   ├── profile/          # Profile-related pages and logic
+│   ├── music-search/     # Music search functionality
+│   ├── audio-books/      # Audiobooks search functionality
+│   └── login/            # Authentication pages
+├── components/            # Shared React components
+├── server/               # Express backend (optional)
+├── styles/               # Global TailwindCSS styles
+├── public/               # Static assets
+└── utils/                # Utility functions and helpers
 ```
 
 ## 🎯 Core Features
@@ -148,73 +153,74 @@ spotify-profile-viewer/
 ```mermaid
 sequenceDiagram
     User->>App: Click "Login with Spotify"
-    App->>API: Redirect to `/api/auth/spotify`
-    API->>Spotify: Request Auth (Client ID, Redirect URI, Scope, State)
-    Spotify-->>User: Display Auth Prompt
+    App->>NextAuth: Redirect to `/api/auth/spotify`
+    NextAuth->>Spotify: Request Auth Code
+    Spotify-->>User: Display Consent Screen
     User->>Spotify: Approve Access
-    Spotify-->>API: Return Auth Code via Callback
-    API->>Spotify: Exchange Auth Code for Access Token
-    Spotify-->>API: Respond with Access Token
-    API-->>App: Forward Access Token
-    App->>LocalStorage: Store Access Token
+    Spotify-->>NextAuth: Return Auth Code
+    NextAuth->>Spotify: Exchange Code for Access Token
+    Spotify-->>NextAuth: Return Access Token
+    NextAuth-->>App: Forward Access Token to Session
     App->>Spotify API: Make Authenticated Requests
     Spotify API-->>App: Respond with User Data
 
 ```
 
-# Spotify Authentication Flow Documentation
+## Spotify Authentication Flow Documentation
 
-## Process Overview
+Process Overview
+	1.	User Initiates Login
+	•	The user clicks the “Login with Spotify” button on the app’s interface. This action triggers the authentication process via NextAuth.
+	2.	NextAuth Sends Authentication Request
+	•	The app utilizes NextAuth’s /api/auth/signin/spotify endpoint, which handles OAuth logic with Spotify.
+	3.	API Communicates with Spotify
+	•	NextAuth sends an authorization request to Spotify’s OAuth URL. This includes:
+	•	Client ID
+	•	Redirect URI (configured in Spotify Developer Dashboard)
+	•	Scopes (e.g., user-read-email, user-read-private, user-top-read)
+	•	A randomly generated state to protect against CSRF attacks.
+	4.	Spotify Prompts the User
+	•	Spotify displays an authorization screen, asking the user to approve access to their data.
+	5.	User Approves Access
+	•	The user grants the requested permissions.
+	6.	Spotify Sends an Authorization Code
+	•	Spotify redirects the user back to the callback URL configured in NextAuth, appending an authorization code.
+	7.	NextAuth Exchanges Code for Token
+	•	NextAuth sends the authorization code to Spotify’s token endpoint, retrieving:
+	•	An access token (to make authenticated API requests)
+	•	A refresh token (to renew access when the token expires)
+	•	A token expiration time.
+	8.	Access Token is Stored in the Session
+	•	NextAuth securely stores the access token within the user session, enabling persistent authentication.
+	9.	Authenticated API Requests
+	•	The app uses the access token from the session to query Spotify’s API for:
+	•	User profile data
+	•	Playlists
+	•	Top tracks and artists
+	10.	Automatic Token Refresh
+	•	NextAuth automatically refreshes the access token using the refresh token, ensuring seamless user experience without interruptions.
 
-1. **User Initiates Login**
-   * The user clicks the "Login with Spotify" button on the app's interface. This action triggers the authentication process.
-
-2. **App Requests Authentication**
-   * The app sends a request to the API endpoint `/api/auth/spotify`, which initiates the OAuth process.
-
-3. **API Communicates with Spotify**
-   * The API forwards a request to Spotify's authentication URL. This request includes key details like the Client ID, Redirect URI, requested scope (permissions), and a randomly generated state to prevent CSRF attacks.
-
-4. **Spotify Prompts the User**
-   * Spotify displays an authentication screen asking the user to approve the app's access to their account. This typically includes permissions to view profile data, playback, or playlists.
-
-5. **User Approves Access**
-   * The user grants permission, confirming the app's requested access.
-
-6. **Spotify Sends an Authorization Code**
-   * Spotify sends an auth code to the API via the callback URL. This code is temporary and needs to be exchanged for a token.
-
-7. **API Exchanges Code for Token**
-   * The API sends the auth code to Spotify in exchange for an access token. The token allows the app to make authorized requests on behalf of the user.
-
-8. **Spotify Responds with Access Token**
-   * Spotify returns the access token (and sometimes a refresh token) to the API. This token is the key to accessing Spotify's data.
-
-9. **App Stores the Token**
-   * The app saves the token (e.g., in localStorage) for subsequent API calls. This step prevents the need for the user to log in repeatedly.
-
-10. **Authenticated Requests to Spotify API**
-    * The app uses the access token to fetch user-specific data, like their profile, playlists, or top tracks, and displays it on the interface.
-
-### 🎵 Music Discovery
-
-- Top artists and tracks
-- Personalized recommendations
-- Playlist generation
-
-## 🔄 API Integration
+🔄 API Integration
 
 <details>
 <summary>Available Endpoints</summary>
 
-| Endpoint | Method | Description |
-|----------|---------|-------------|
-| `/api/auth/spotify` | GET | Initiate Spotify OAuth |
-| `/api/auth/callback` | GET | OAuth callback handler |
-| `/api/profile` | GET | Get user profile |
-| `/api/top-tracks` | GET | Get user's top tracks |
+
+Endpoint	Method	Description
+/api/auth/signin	POST	Initiates the NextAuth Spotify login
+/api/auth/session	GET	Fetches the active user session
+/api/auth/signout	POST	Ends the user session
+/api/auth/callback/spotify	GET	Handles Spotify OAuth callbacks
 
 </details>
+
+
+🎵 Music Discovery Features
+	•	Top Tracks and Artists: Displays user’s top tracks and favorite artists.
+	•	Dynamic Search: Search and explore music, albums, and playlists via Spotify’s API.
+	•	Audiobook Integration: Discover and search Spotify’s audiobook catalog.
+
+This flow is securely managed using NextAuth as the primary authentication solution, reducing boilerplate and improving the maintainability of the app.
 
 </div>
 

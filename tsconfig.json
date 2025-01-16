@@ -27,7 +27,7 @@
     // Specify type declaration files to include
     "typeRoots": ["./types", "./node_modules/@types"],
     // Specify files to be included in the compilation
-    "include": ["**/*.ts", "**/*.tsx"],
+    //"include": ["**/*.ts", "**/*.tsx"],
     // Enable incremental compilation for faster builds
     "incremental": true,
     // Enable plugins for TypeScript tooling

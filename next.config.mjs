@@ -9,48 +9,40 @@ const nextConfig = {
   },
   images: {
     domains: [
-      'image-cdn-fa.spotifycdn.com', 
-      'localhost', 
-      'mosaic.scdn.co', 
-      'i.scdn.co', 
-      'image-cdn-ak.spotifycdn.com', 
-      'cdn-images-1.medium.com', // Commonly used for blog images
-      'platform-lookaside.fbsbx.com', // Facebook profile images
-      'lh3.googleusercontent.com', // Google profile images
-      'pbs.twimg.com', // Twitter profile images
-      'avatars.githubusercontent.com', // GitHub profile images
-      'res.cloudinary.com', // Cloudinary images
-      'images.unsplash.com', // Unsplash images
-      'placekitten.com', // Placeholder images (if needed)
-      'dummyimage.com', // Placeholder dummy images
-      'gravatar.com', // Gravatar profile images
-      'pixabay.com', // Pixabay images
+      'i.scdn.co',
+      'mosaic.scdn.co',
+      'image-cdn-fa.spotifycdn.com',
+      'image-cdn-ak.spotifycdn.com',
+      'localhost',
+      'cdn-images-1.medium.com',
+      'platform-lookaside.fbsbx.com',
+      'lh3.googleusercontent.com',
+      'pbs.twimg.com',
+      'avatars.githubusercontent.com',
+      'res.cloudinary.com',
+      'images.unsplash.com',
+      'placekitten.com',
+      'dummyimage.com',
+      'gravatar.com',
+      'pixabay.com',
     ],
     remotePatterns: [
       {
         protocol: 'https',
         hostname: '**.spotifycdn.com',
       },
-      {
-        protocol: 'https',
-        hostname: '**.unsplash.com',
-      },
-      {
-        protocol: 'https',
-        hostname: '**.cloudinary.com',
-      },
     ],
   },
-  reactStrictMode: true, // Enable React Strict Mode
-  trailingSlash: false, // Ensure consistent URL handling
+  reactStrictMode: true,
+  trailingSlash: false,
   experimental: {
-    optimizeCss: true, // Optimize CSS for faster builds
-    appDir: true, // Support for the new app directory structure
+    optimizeCss: true,
+    appDir: true,
   },
   webpack: (config) => {
     config.resolve.fallback = {
       ...config.resolve.fallback,
-      fs: false, // Avoid "fs" module errors in browser environments
+      fs: false,
     };
     return config;
   },

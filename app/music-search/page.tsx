@@ -1,27 +1,25 @@
 'use client';
 
-import { useSession, signIn, signOut } from 'next-auth/react';
 import { useState } from 'react';
+import { useSession, signIn } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import Image from 'next/image';
 
-type Track = {
-  id: string;
-  name: string;
-  album: {
-    images: Array<{ url: string }>;
-  };
-  artists: Array<{ name: string }>;
-};
-
-export default function MusicSearch() {
+export default function MusicSearchPage() {
   const { data: session } = useSession();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<Track[]>([]);
+  const [query, setQuery] = useState('');
+  const [tracks, setTracks] = useState<Track[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  interface Track {
+    id: string;
+    name: string;
+    artists: { name: string }[];
+    album: { images: { url: string }[] };
+  }
 
   if (!session) {
     return (
@@ -38,7 +36,7 @@ export default function MusicSearch() {
   }
 
   const handleSearch = async () => {
-    if (!searchQuery.trim()) {
+    if (!query.trim()) {
       setError('Please enter a search term.');
       return;
     }
@@ -47,28 +45,32 @@ export default function MusicSearch() {
     setError(null);
 
     try {
+      const accessToken = session.user?.accessToken;
+      if (!accessToken) {
+        setError('Access token is missing. Please log in again.');
+        return;
+      }
+
       const response = await fetch(
-        `https://api.spotify.com/v1/search?q=${encodeURIComponent(
-          searchQuery
-        )}&type=track,artist,album&limit=10`,
+        `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=10`,
         {
           headers: {
-            Authorization: `Bearer ${session.accessToken}`,
+            Authorization: `Bearer ${accessToken}`,
           },
         }
       );
 
       if (!response.ok) {
         const errorData = await response.json();
-        setError(`Failed to fetch search results: ${errorData.error?.message || response.statusText}`);
+        setError(`Failed to fetch tracks: ${errorData.error?.message || response.statusText}`);
         return;
       }
 
       const data = await response.json();
-      setSearchResults(data.tracks?.items || []);
+      setTracks(data.tracks?.items || []);
     } catch (err) {
-      console.error('Error searching Spotify:', err);
-      setError('An error occurred while fetching search results.');
+      console.error('Error fetching tracks:', err);
+      setError('An error occurred while fetching music.');
     } finally {
       setLoading(false);
     }
@@ -76,21 +78,20 @@ export default function MusicSearch() {
 
   return (
     <ScrollArea className="min-h-screen bg-gradient-to-b from-gray-900 via-black to-gray-800 text-white p-8 space-y-8">
-      {/* Header */}
       <div className="text-center">
-        <h1 className="text-4xl font-bold text-primary mb-4">Music Search</h1>
-        <p className="text-lg text-muted">Search for tracks, artists, and albums from Spotify!</p>
+        <h1 className="text-4xl font-bold text-primary mb-4">Search Music</h1>
+        <p className="text-lg text-muted">
+          Discover your favorite songs and artists from Spotify!
+        </p>
       </div>
 
-      {/* Search Bar */}
-      <div className="flex flex-col items-center space-y-4">
+      <div className="flex flex-col items-center space-y-4 mb-8">
         <input
           type="text"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Search for songs, artists, albums..."
-          aria-label="Search for music"
-          className="w-full max-w-xl p-4 bg-zinc-800 text-white text-lg rounded-lg placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-primary"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search for music..."
+          className="w-full max-w-lg p-4 rounded-lg bg-zinc-800 text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-primary"
         />
         <Button
           className="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg text-lg"
@@ -100,50 +101,31 @@ export default function MusicSearch() {
         </Button>
       </div>
 
-      {/* Error States */}
+      {loading && <p className="text-center text-white text-lg">Loading tracks...</p>}
       {error && <p className="text-center text-red-500 text-lg">{error}</p>}
 
-      {/* Search Results */}
-      {searchResults.length > 0 ? (
+      {tracks.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {searchResults.map((item) => (
+          {tracks.map((track) => (
             <Card
-              key={item.id}
+              key={track.id}
               className="p-6 bg-gradient-to-b from-zinc-800 via-zinc-700 to-black rounded-lg shadow-md hover:shadow-lg hover:scale-105 transition-transform"
             >
               <Image
-                src={item.album?.images[0]?.url || '/images/placeholder.jpg'}
-                alt={item.name || 'Unknown Track'}
-                width={300}
-                height={300}
-                priority
+                src={track.album.images?.[0]?.url || '/images/placeholder-album.jpg'}
+                alt={track.name}
+                width={320}
+                height={160}
+                className="w-full h-40 object-cover rounded-lg mb-4"
               />
-              <h3 className="text-xl font-semibold text-white">{item.name || 'Unknown Track'}</h3>
+              <h3 className="text-xl font-semibold text-white">{track.name}</h3>
               <p className="text-zinc-400 text-sm">
-                {item.artists.map((artist) => artist.name).join(', ') || 'Unknown Artists'}
+                Artist: {track.artists.map((artist) => artist.name).join(', ')}
               </p>
             </Card>
           ))}
         </div>
-      ) : (
-        !loading && !error && (
-          <p className="text-center text-zinc-400 text-lg mt-12">
-            No results found. Try searching for something else!
-          </p>
-        )
       )}
-
-      {/* Logout Button */}
-      <div className="text-center mt-8">
-        <Button
-          variant="destructive"
-          size="lg"
-          className="px-8 py-4"
-          onClick={() => signOut()}
-        >
-          Sign out
-        </Button>
-      </div>
     </ScrollArea>
   );
 }

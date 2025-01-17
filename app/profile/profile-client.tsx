@@ -2,42 +2,42 @@
 
 import Image from 'next/image';
 import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Avatar } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
-import { ScrollArea } from '@/components/ui/scroll-area';
-
-interface UserData {
-  display_name: string;
-  email: string;
-  country: string;
-  followers: { total: number };
-  product: string;
-  images?: { url: string }[];
-}
-
-interface Playlist {
-  id: string;
-  name: string;
-  images?: { url: string }[];
-}
-
-interface Track {
-  id: string;
-  name: string;
-  artists: { name: string }[];
-}
-
-interface RecentlyPlayedItem {
-  track: Track;
-}
 
 interface ProfileClientProps {
-  userData: UserData;
-  playlists: Playlist[];
-  topTracks: Track[];
-  topArtists: { id: string; name: string }[];
-  recentlyPlayed: RecentlyPlayedItem[];
+  userData: {
+    display_name: string;
+    email: string;
+    country: string;
+    followers: { total: number };
+    product: string;
+    images: { url: string }[];
+  };
+  playlists: {
+    id: string;
+    name: string;
+    images: { url: string }[];
+  }[];
+  topTracks: {
+    id: string;
+    name: string;
+    album: { name: string; images: { url: string }[] };
+    artists: { name: string }[];
+  }[];
+  topArtists: {
+    id: string;
+    name: string;
+    images: { url: string }[];
+    genres: string[];
+  }[];
+  recentlyPlayed: {
+    track: {
+      id: string;
+      name: string;
+      album: { name: string; images: { url: string }[] };
+      artists: { name: string }[];
+    };
+    played_at: string;
+  }[];
 }
 
 export default function ProfileClient({
@@ -47,129 +47,111 @@ export default function ProfileClient({
   topArtists,
   recentlyPlayed,
 }: ProfileClientProps) {
-  const handleLogout = () => {
-    document.cookie = 'spotify_access_token=; Max-Age=0; path=/;';
-    localStorage.removeItem('spotify_access_token');
-    window.location.href = '/login';
-  };
-
   return (
-    <ScrollArea className="space-y-12 p-8 bg-gradient-to-b from-gray-900 via-gray-800 to-black text-white min-h-screen">
-      {/* User Profile Section */}
-      <Card className="p-8 flex items-center space-x-8 bg-gradient-to-r from-zinc-800 via-zinc-700 to-zinc-900 rounded-lg shadow-xl hover:shadow-2xl transition-shadow">
-        <Avatar className="w-24 h-24">
+    <div className="space-y-8">
+      {/* User Info */}
+      <Card className="p-6 bg-gradient-to-b from-zinc-800 via-zinc-700 to-black rounded-lg shadow-md">
+        <div className="flex flex-col items-center space-y-4">
           <Image
-            src={userData.images?.[0]?.url || '/images/placeholder-user.jpg'}
-            alt="Profile"
-            width={96}
-            height={96}
-            className="rounded-full"
+            src={userData.images?.[0]?.url || '/placeholder-user.jpg'}
+            alt={`${userData.display_name}'s profile`}
+            width={150}
+            height={150}
+            className="rounded-full shadow-md"
           />
-        </Avatar>
-        <div className="flex flex-col space-y-2">
-          <h1 className="text-4xl font-extrabold text-primary">{userData.display_name}</h1>
-          <p className="text-lg text-muted">Email: {userData.email}</p>
-          <p className="text-lg text-muted">Country: {userData.country}</p>
-          <p className="text-lg text-muted">Followers: {userData.followers?.total}</p>
-          <p className="text-lg text-muted">
-            Account Type: <Badge variant="default">{userData.product}</Badge>
-          </p>
+          <h1 className="text-3xl font-bold text-primary">{userData.display_name}</h1>
+          <div className="text-zinc-400 space-y-1 text-center">
+            <p>Email: {userData.email}</p>
+            <p>Country: {userData.country}</p>
+            <p>Followers: {userData.followers.total}</p>
+            <p>Subscription: {userData.product}</p>
+          </div>
         </div>
       </Card>
 
-      {/* Playlists Section */}
-      <section>
-        <h2 className="text-3xl font-bold mb-6 text-secondary">Your Playlists</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      {/* Playlists */}
+      <Card className="p-6 bg-gradient-to-b from-zinc-800 via-zinc-700 to-black rounded-lg shadow-md">
+        <h2 className="text-2xl font-semibold mb-4 text-primary">Playlists</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {playlists.map((playlist) => (
-            <Card
-              key={playlist.id}
-              className="p-6 bg-gradient-to-b from-zinc-800 via-gray-700 to-gray-900 rounded-lg shadow-md hover:shadow-lg hover:scale-105 transition-all"
-            >
+            <Card key={playlist.id} className="p-4 bg-zinc-700 rounded-lg shadow-md">
               <Image
-                src={playlist.images?.[0]?.url || '/images/placeholder-playlist.jpg'}
+                src={playlist.images?.[0]?.url || '/placeholder.jpg'}
                 alt={playlist.name}
-                width={160}
-                height={160}
-                className="rounded-md shadow-md"
+                width={120}
+                height={120}
+                className="rounded-lg"
               />
-              <p className="text-center mt-4 text-lg font-semibold text-zinc-100">{playlist.name}</p>
+              <p className="text-white mt-2">{playlist.name}</p>
             </Card>
           ))}
         </div>
-      </section>
+      </Card>
 
-      {/* Top Tracks Section */}
-      <section>
-        <h2 className="text-3xl font-bold mb-6 text-primary">Your Top Tracks</h2>
-        <ul className="space-y-4">
+      {/* Top Tracks */}
+      <Card className="p-6 bg-gradient-to-b from-zinc-800 via-zinc-700 to-black rounded-lg shadow-md">
+        <h2 className="text-2xl font-semibold mb-4 text-primary">Top Tracks</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {topTracks.map((track) => (
-            <li key={track.id} className="flex items-center space-x-6 bg-zinc-800 p-4 rounded-lg shadow-md hover:shadow-lg">
+            <Card key={track.id} className="p-4 bg-zinc-700 rounded-lg shadow-md">
               <Image
-                src="/images/music-note.svg"
-                alt="Track Icon"
-                width={32}
-                height={32}
-                className="mr-4"
+                src={track.album.images?.[0]?.url || '/placeholder.jpg'}
+                alt={track.name}
+                width={120}
+                height={120}
+                className="rounded-lg"
               />
-                <span className="text-lg font-semibold">{track.name}</span>
-              <span className="ml-auto text-sm text-zinc-400">
-                by {track.artists.map((artist) => artist.name).join(', ')}
-              </span>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      {/* Top Artists Section */}
-      <section>
-        <h2 className="text-3xl font-bold mb-6 text-secondary">Your Top Artists</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {topArtists.map((artist) => (
-            <Card
-              key={artist.id}
-              className="flex items-center p-4 bg-gradient-to-r from-gray-800 to-gray-900 rounded-lg shadow-md hover:shadow-lg"
-            >
-              <Image
-                src="/images/artist-icon.svg"
-                alt="Artist Icon"
-                width={48}
-                height={48}
-                className="mr-4"
-              />
-              <p className="text-lg font-semibold">{artist.name}</p>
+              <p className="text-white mt-2">{track.name}</p>
+              <p className="text-zinc-400 text-sm">
+                {track.artists.map((artist) => artist.name).join(', ')}
+              </p>
             </Card>
           ))}
         </div>
-      </section>
+      </Card>
 
-      {/* Recently Played Tracks Section */}
-      <section>
-        <h2 className="text-3xl font-bold mb-6 text-primary">Recently Played Tracks</h2>
-        <ul className="space-y-4">
-          {recentlyPlayed.map((item) => (
-            <li key={item.track.id} className="flex items-center space-x-6 bg-zinc-800 p-4 rounded-lg shadow-md hover:shadow-lg">
+      {/* Top Artists */}
+      <Card className="p-6 bg-gradient-to-b from-zinc-800 via-zinc-700 to-black rounded-lg shadow-md">
+        <h2 className="text-2xl font-semibold mb-4 text-primary">Top Artists</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {topArtists.map((artist) => (
+            <Card key={artist.id} className="p-4 bg-zinc-700 rounded-lg shadow-md">
               <Image
-                src="/images/recent-play.svg"
-                alt="Recently Played Icon"
-                width={32}
-                height={32}
+                src={artist.images?.[0]?.url || '/placeholder.jpg'}
+                alt={artist.name}
+                width={120}
+                height={120}
+                className="rounded-lg"
               />
-              <span className="text-lg font-semibold">{item.track.name}</span>
-              <span className="ml-auto text-sm text-zinc-400">
-                by {item.track.artists.map((artist) => artist.name).join(', ')}
-              </span>
-            </li>
+              <p className="text-white mt-2">{artist.name}</p>
+              <p className="text-zinc-400 text-sm">{artist.genres.join(', ')}</p>
+            </Card>
           ))}
-        </ul>
-      </section>
+        </div>
+      </Card>
 
-      {/* Logout Button */}
-      <div className="text-center mt-12">
-        <Button variant="destructive" size="lg" className="px-8 py-4" onClick={handleLogout}>
-          Logout
-        </Button>
-      </div>
-    </ScrollArea>
+      {/* Recently Played */}
+      <Card className="p-6 bg-gradient-to-b from-zinc-800 via-zinc-700 to-black rounded-lg shadow-md">
+        <h2 className="text-2xl font-semibold mb-4 text-primary">Recently Played</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {recentlyPlayed.map((item) => (
+            <Card key={item.track.id} className="p-4 bg-zinc-700 rounded-lg shadow-md">
+              <Image
+                src={item.track.album.images?.[0]?.url || '/placeholder.jpg'}
+                alt={item.track.name}
+                width={120}
+                height={120}
+                className="rounded-lg"
+              />
+              <p className="text-white mt-2">{item.track.name}</p>
+              <p className="text-zinc-400 text-sm">
+                {item.track.artists.map((artist) => artist.name).join(', ')}
+              </p>
+              <p className="text-zinc-400 text-xs">Played at: {new Date(item.played_at).toLocaleString()}</p>
+            </Card>
+          ))}
+        </div>
+      </Card>
+    </div>
   );
 }

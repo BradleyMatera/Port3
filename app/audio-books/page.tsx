@@ -7,7 +7,6 @@ import { Card } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import Image from 'next/image';
 
-
 export default function AudiobooksSearchPage() {
   const { data: session } = useSession();
   const [query, setQuery] = useState('');
@@ -45,7 +44,7 @@ export default function AudiobooksSearchPage() {
         `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=audiobook&limit=10`,
         {
           headers: {
-            Authorization: `Bearer ${session.accessToken}`,
+            Authorization: `Bearer ${session.user?.accessToken}`, // Fix accessToken usage
           },
         }
       );
@@ -68,7 +67,6 @@ export default function AudiobooksSearchPage() {
 
   return (
     <ScrollArea className="min-h-screen bg-gradient-to-b from-gray-900 via-black to-gray-800 text-white p-8 space-y-8">
-      {/* Header */}
       <div className="text-center">
         <h1 className="text-4xl font-bold text-primary mb-4">Search Audiobooks</h1>
         <p className="text-lg text-muted">
@@ -76,7 +74,6 @@ export default function AudiobooksSearchPage() {
         </p>
       </div>
 
-      {/* Search Bar */}
       <div className="flex flex-col items-center space-y-4 mb-8">
         <input
           type="text"
@@ -93,11 +90,9 @@ export default function AudiobooksSearchPage() {
         </Button>
       </div>
 
-      {/* Loading and Error States */}
       {loading && <p className="text-center text-white text-lg">Loading audiobooks...</p>}
       {error && <p className="text-center text-red-500 text-lg">{error}</p>}
 
-      {/* Results Section */}
       {audiobooks.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {audiobooks.map((audiobook) => (
@@ -105,13 +100,13 @@ export default function AudiobooksSearchPage() {
               key={audiobook.id}
               className="p-6 bg-gradient-to-b from-zinc-800 via-zinc-700 to-black rounded-lg shadow-md hover:shadow-lg hover:scale-105 transition-transform"
             >
-   <Image
-  src={audiobook.images[0]?.url || '/fallback-image.jpg'}
-  alt={audiobook.name || 'Fallback description'}
-  width={300}
-  height={300}
-  priority
-/>
+              <Image
+                src={audiobook.images[0]?.url || '/fallback-image.jpg'}
+                alt={audiobook.name || 'Fallback description'}
+                width={300}
+                height={300}
+                priority
+              />
               <h3 className="text-xl font-semibold text-white">{audiobook.name}</h3>
               <p className="text-zinc-400 text-sm">
                 By {audiobook.authors?.map((author) => author.name).join(', ')}

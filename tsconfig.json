@@ -51,5 +51,10 @@
     ".next/types/**/*.ts"
   ],
   // Specify files to exclude from the project
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules",
+    ".next",
+    "components/ui/sidebar.tsx", // Exclude specific files
+    
+]
 }

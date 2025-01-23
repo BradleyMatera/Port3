@@ -17,9 +17,48 @@ export default function SpotifyPlayerPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  const fetchUserPlaylists = async () => {
+    if (!accessToken) return;
+
+    setLoading(true);
+    try {
+      const response = await fetch('https://api.spotify.com/v1/me/playlists', {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          setError('Session expired. Please log in again.');
+          localStorage.removeItem('spotify_access_token');
+          window.location.href = 'http://localhost:3001/login';
+        } else {
+          throw new Error(`Failed to fetch playlists: ${response.statusText}`);
+        }
+      } else {
+        const data = await response.json();
+        if (data?.items?.length > 0) {
+          const playlistData = data.items.map((item: PlaylistItem) => ({
+            id: item.id,
+            name: item.name,
+            uri: item.uri,
+          }));
+          setPlaylists(playlistData);
+        } else {
+          setError('No playlists found.');
+        }
+      }
+    } catch (err) {
+      console.error('Error fetching playlists:', err);
+      setError('An error occurred while fetching playlists.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get('access_token');
+    const playlistUri = urlParams.get('playlist_uri'); // Get the playlist URI from query params
 
     if (token) {
       localStorage.setItem('spotify_access_token', token);
@@ -32,49 +71,19 @@ export default function SpotifyPlayerPage() {
         window.location.href = 'http://localhost:3001/login';
       }
     }
+
+    if (playlistUri) {
+      setSelectedPlaylistUri(playlistUri); // Set the playlist to auto-play
+    }
   }, []);
 
   useEffect(() => {
-    if (!accessToken) return;
-
-    const fetchUserPlaylists = async () => {
-      setLoading(true);
-      try {
-        const response = await fetch('https://api.spotify.com/v1/me/playlists', {
-          headers: { Authorization: `Bearer ${accessToken}` },
-        });
-
-        if (!response.ok) {
-          if (response.status === 401) {
-            setError('Session expired. Please log in again.');
-            localStorage.removeItem('spotify_access_token');
-            window.location.href = 'http://localhost:3001/login';
-          } else {
-            throw new Error(`Failed to fetch playlists: ${response.statusText}`);
-          }
-        } else {
-          const data = await response.json();
-          if (data?.items?.length > 0) {
-            const playlistData = data.items.map((item: PlaylistItem) => ({
-              id: item.id,
-              name: item.name,
-              uri: item.uri,
-            }));
-            setPlaylists(playlistData);
-          } else {
-            setError('No playlists found.');
-          }
-        }
-      } catch (err) {
-        console.error('Error fetching playlists:', err);
-        setError('An error occurred while fetching playlists.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUserPlaylists();
+    fetchUserPlaylists(); // Fetch playlists whenever the access token changes
   }, [accessToken]);
+
+  const handleReloadPlaylist = () => {
+    fetchUserPlaylists(); // Force refresh the playlist when triggered
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 via-black to-gray-800 text-white p-8">
@@ -110,7 +119,7 @@ export default function SpotifyPlayerPage() {
         )}
         {selectedPlaylistUri ? (
           <iframe
-            src={`https://open.spotify.com/embed/playlist/${selectedPlaylistUri.split(':')[2]}`}
+            src={`https://open.spotify.com/embed/playlist/${selectedPlaylistUri.split(':')[2]}?utm_source=web`}
             width="100%"
             height="380"
             frameBorder="0"
@@ -129,11 +138,8 @@ export default function SpotifyPlayerPage() {
       </Card>
 
       <div className="mt-8 flex justify-center space-x-4">
-        <Button
-          variant="default"
-          onClick={() => (window.location.href = 'http://localhost:3001/login')}
-        >
-          Reload Player
+        <Button variant="default" onClick={handleReloadPlaylist}>
+          Reload Playlists
         </Button>
         <Button
           variant="destructive"

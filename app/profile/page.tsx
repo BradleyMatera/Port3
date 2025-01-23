@@ -67,9 +67,9 @@ export default function Profile() {
         const [user, playlistsData, tracksData, artistsData, recentlyPlayedData] = await Promise.all([
           fetchWithAuth('https://api.spotify.com/v1/me'),
           fetchWithAuth('https://api.spotify.com/v1/me/playlists'),
-          fetchWithAuth('https://api.spotify.com/v1/me/top/tracks'),
-          fetchWithAuth('https://api.spotify.com/v1/me/top/artists'),
-          fetchWithAuth('https://api.spotify.com/v1/me/player/recently-played'),
+          fetchWithAuth('https://api.spotify.com/v1/me/top/tracks'), //no work!
+          fetchWithAuth('https://api.spotify.com/v1/me/top/artists'),//no work!
+          fetchWithAuth('https://api.spotify.com/v1/me/player/recently-played'),//no work!
         ]);
 
         setUserData(user);
@@ -79,7 +79,7 @@ export default function Profile() {
         setRecentlyPlayed(recentlyPlayedData.items || []);
       } catch (err) {
         console.error('Error fetching profile data:', err);
-        setError('Failed to fetch profile data.');
+        setError('Failed to fetch profile data.');// now work!
       } finally {
         setLoading(false);
       }

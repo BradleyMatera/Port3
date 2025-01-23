@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSession, signIn } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -10,30 +10,40 @@ import Image from 'next/image';
 export default function MusicSearchPage() {
   const { data: session } = useSession();
   const [query, setQuery] = useState('');
-  const [tracks, setTracks] = useState<Track[]>([]);
+  const [tracks, setTracks] = useState<any[]>([]);
+  const [playlists, setPlaylists] = useState<{ id: string; name: string }[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedPlaylist, setSelectedPlaylist] = useState<string | null>(null);
 
-  interface Track {
-    id: string;
-    name: string;
-    artists: { name: string }[];
-    album: { images: { url: string }[] };
-  }
+  useEffect(() => {
+    const fetchPlaylists = async () => {
+      const accessToken = session?.user?.accessToken;
+      if (!accessToken) return;
 
-  if (!session) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-gray-900 via-black to-gray-800 text-white flex flex-col items-center justify-center">
-        <h1 className="text-4xl font-bold mb-8">Sign In to Search Music</h1>
-        <Button
-          onClick={() => signIn('spotify')}
-          className="bg-green-500 hover:bg-green-600 text-white px-8 py-4 text-lg rounded-lg"
-        >
-          Sign in with Spotify
-        </Button>
-      </div>
-    );
-  }
+      try {
+        const response = await fetch('https://api.spotify.com/v1/me/playlists', {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch playlists');
+        }
+
+        const data = await response.json();
+        setPlaylists(data.items || []);
+      } catch (err) {
+        console.error('Error fetching playlists:', err);
+        setError('Failed to fetch playlists.');
+      }
+    };
+
+    if (session) {
+      fetchPlaylists();
+    }
+  }, [session]);
 
   const handleSearch = async () => {
     if (!query.trim()) {
@@ -45,7 +55,7 @@ export default function MusicSearchPage() {
     setError(null);
 
     try {
-      const accessToken = session.user?.accessToken;
+      const accessToken = session?.user?.accessToken;
       if (!accessToken) {
         setError('Access token is missing. Please log in again.');
         return;
@@ -75,6 +85,117 @@ export default function MusicSearchPage() {
       setLoading(false);
     }
   };
+
+  const handleAddToPlaylist = async (trackUri: string) => {
+    if (!selectedPlaylist) {
+      setError('Please select a playlist to add the song.');
+      return;
+    }
+
+    const accessToken = session?.user?.accessToken;
+    if (!accessToken) {
+      setError('Access token is missing. Please log in again.');
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `https://api.spotify.com/v1/playlists/${selectedPlaylist}/tracks`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            uris: [trackUri],
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Error details:', errorData);
+        throw new Error(
+          errorData.error?.message || 'Failed to add track to playlist'
+        );
+      }
+
+      alert('Track added successfully!');
+    } catch (err) {
+      console.error('Error adding track to playlist:', err);
+      const errorMessage = err instanceof Error ? err.message : 'An error occurred while adding the track to the playlist.';
+      setError(errorMessage);
+    }
+  };
+
+const handlePlayTrack = async (trackUri: string) => {
+  const accessToken = session?.user?.accessToken;
+  if (!accessToken) {
+    setError('Access token is missing. Please log in again.');
+    return;
+  }
+
+  try {
+    // Fetch active devices
+    const deviceResponse = await fetch('https://api.spotify.com/v1/me/player/devices', {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    if (!deviceResponse.ok) {
+      throw new Error('Failed to fetch devices.');
+    }
+
+    const deviceData = await deviceResponse.json();
+
+    if (!deviceData.devices || deviceData.devices.length === 0) {
+      alert('No active devices found. Please open Spotify on a device and try again.');
+      return;
+    }
+
+    // Get the first active device
+    const activeDevice = deviceData.devices.find((device: any) => device.is_active) || deviceData.devices[0];
+    const activeDeviceId = activeDevice.id;
+
+    // Play the track on the selected device
+    const playResponse = await fetch('https://api.spotify.com/v1/me/player/play', {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        uris: [trackUri],
+        device_id: activeDeviceId,
+      }),
+    });
+
+    if (!playResponse.ok) {
+      throw new Error('Failed to play the track. Make sure Spotify is active on your device.');
+    }
+
+    alert('Playing track!');
+  } catch (err) {
+    console.error('Error playing track:', err);
+    setError(err instanceof Error ? err.message : 'Failed to play the track.');
+  }
+};
+
+  if (!session) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-gray-900 via-black to-gray-800 text-white flex flex-col items-center justify-center">
+        <h1 className="text-4xl font-bold mb-8">Sign In to Search Music</h1>
+        <Button
+          onClick={() => signIn('spotify')}
+          className="bg-green-500 hover:bg-green-600 text-white px-8 py-4 text-lg rounded-lg"
+        >
+          Sign in with Spotify
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <ScrollArea className="min-h-screen bg-gradient-to-b from-gray-900 via-black to-gray-800 text-white p-8 space-y-8">
@@ -120,8 +241,37 @@ export default function MusicSearchPage() {
               />
               <h3 className="text-xl font-semibold text-white">{track.name}</h3>
               <p className="text-zinc-400 text-sm">
-                Artist: {track.artists.map((artist) => artist.name).join(', ')}
+                {track.artists.map((artist: { name: string }) => artist.name).join(', ')}
               </p>
+              <div className="flex flex-col space-y-2 mt-4">
+                <select
+                  title="Select a playlist"
+                  className="w-full p-3 rounded-lg bg-zinc-800 text-white focus:outline-none focus:ring-2 focus:ring-primary"
+                  onChange={(e) => setSelectedPlaylist(e.target.value)}
+                  value={selectedPlaylist || ''}
+                >
+                  <option value="" disabled>
+                    Select Playlist
+                  </option>
+                  {playlists.map((playlist) => (
+                    <option key={playlist.id} value={playlist.id}>
+                      {playlist.name}
+                    </option>
+                  ))}
+                </select>
+                <Button
+                  className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg text-lg"
+                  onClick={() => handleAddToPlaylist(track.uri)}
+                >
+                  Add to Playlist
+                </Button>
+                <Button
+                  className="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg text-lg"
+                  onClick={() => handlePlayTrack(track.uri)}
+                >
+                  Play
+                </Button>
+              </div>
             </Card>
           ))}
         </div>

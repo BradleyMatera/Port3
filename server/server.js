@@ -32,7 +32,7 @@ function generateRandomString(length) {
 app.get('/login', (req, res) => {
   const state = generateRandomString(16);
   const scope =
-    'user-read-private user-read-email user-library-read playlist-read-private user-modify-playback-state user-read-playback-state streaming';
+    'user-read-private user-read-email user-library-read playlist-read-private playlist-modify-public playlist-modify-private user-modify-playback-state user-read-playback-state streaming';
 
   const authURL =
     'https://accounts.spotify.com/authorize?' +
@@ -44,6 +44,7 @@ app.get('/login', (req, res) => {
       state,
     });
 
+  console.log(`[LOGIN]: Redirecting to Spotify Auth URL: ${authURL}`);
   res.redirect(authURL);
 });
 
@@ -52,6 +53,7 @@ app.get('/auth/callback', async (req, res) => {
   const code = req.query.code || null;
 
   if (!code) {
+    console.error('[CALLBACK]: Missing authorization code.');
     return res.status(400).send('Code is missing from the callback.');
   }
 
@@ -75,15 +77,19 @@ app.get('/auth/callback', async (req, res) => {
       }
     );
 
-    const { access_token } = tokenResponse.data;
+    const { access_token, refresh_token, expires_in } = tokenResponse.data;
 
     if (access_token) {
-      res.redirect(`http://localhost:3000/player?access_token=${access_token}`);
+      console.log('[CALLBACK]: Access token successfully retrieved.');
+      res.redirect(
+        `http://localhost:3000/player?access_token=${access_token}&refresh_token=${refresh_token}&expires_in=${expires_in}`
+      );
     } else {
+      console.error('[CALLBACK]: Access token retrieval failed.');
       res.status(500).send('Failed to retrieve access token.');
     }
   } catch (error) {
-    console.error('Error exchanging code for token:', error.response?.data || error.message);
+    console.error('[CALLBACK]: Error exchanging code for token:', error.response?.data || error.message);
     res.status(500).send('Internal Server Error during token exchange.');
   }
 });
@@ -93,6 +99,7 @@ app.get('/playlists', async (req, res) => {
   const accessToken = req.query.access_token;
 
   if (!accessToken) {
+    console.error('[PLAYLISTS]: Missing access token.');
     return res.status(400).json({ error: 'Access token is required.' });
   }
 
@@ -104,12 +111,14 @@ app.get('/playlists', async (req, res) => {
     });
 
     if (playlistsResponse.data) {
+      console.log('[PLAYLISTS]: Retrieved user playlists successfully.');
       res.json(playlistsResponse.data);
     } else {
+      console.error('[PLAYLISTS]: No playlists found.');
       res.status(404).json({ error: 'No playlists found.' });
     }
   } catch (error) {
-    console.error('Error fetching playlists:', error.response?.data || error.message);
+    console.error('[PLAYLISTS]: Error fetching playlists:', error.response?.data || error.message);
     res.status(error.response?.status || 500).json({
       error: error.response?.data?.error?.message || 'Internal Server Error',
     });
@@ -121,6 +130,7 @@ app.post('/add-to-playlist', async (req, res) => {
   const { playlistId, trackUri, access_token } = req.body;
 
   if (!playlistId || !trackUri || !access_token) {
+    console.error('[ADD-TRACK]: Missing required parameters.');
     return res.status(400).json({ error: 'playlistId, trackUri, and access_token are required.' });
   }
 
@@ -136,9 +146,10 @@ app.post('/add-to-playlist', async (req, res) => {
       }
     );
 
+    console.log('[ADD-TRACK]: Track added to playlist successfully.');
     res.status(200).send('Track added to playlist successfully!');
   } catch (error) {
-    console.error('Error adding track to playlist:', error.response?.data || error.message);
+    console.error('[ADD-TRACK]: Error adding track to playlist:', error.response?.data || error.message);
     res.status(500).send('Internal Server Error while adding track.');
   }
 });
@@ -149,6 +160,7 @@ app.put('/playback/:action', async (req, res) => {
   const { action } = req.params;
 
   if (!access_token) {
+    console.error('[PLAYBACK]: Missing access token.');
     return res.status(400).json({ error: 'Access token is required.' });
   }
 
@@ -161,6 +173,7 @@ app.put('/playback/:action', async (req, res) => {
 
   const url = endpoints[action];
   if (!url) {
+    console.error('[PLAYBACK]: Invalid playback action.');
     return res.status(400).json({ error: 'Invalid playback action.' });
   }
 
@@ -173,9 +186,10 @@ app.put('/playback/:action', async (req, res) => {
       },
     });
 
+    console.log(`[PLAYBACK]: ${action} playback action succeeded.`);
     res.status(200).send(`${action} playback action succeeded.`);
   } catch (error) {
-    console.error(`Error during ${action}:`, error.response?.data || error.message);
+    console.error(`[PLAYBACK]: Error during ${action}:`, error.response?.data || error.message);
     res.status(500).send(`Internal Server Error during ${action}.`);
   }
 });
@@ -185,6 +199,7 @@ app.get('/refresh_token', async (req, res) => {
   const refreshToken = req.query.refresh_token;
 
   if (!refreshToken) {
+    console.error('[REFRESH-TOKEN]: Missing refresh token.');
     return res.status(400).json({ error: 'Refresh token is required.' });
   }
 
@@ -207,9 +222,10 @@ app.get('/refresh_token', async (req, res) => {
       }
     );
 
+    console.log('[REFRESH-TOKEN]: Token refreshed successfully.');
     res.json(refreshResponse.data);
   } catch (error) {
-    console.error('Error refreshing access token:', error.response?.data || error.message);
+    console.error('[REFRESH-TOKEN]: Error refreshing access token:', error.response?.data || error.message);
     res.status(500).json({ error: 'Failed to refresh token.' });
   }
 });
